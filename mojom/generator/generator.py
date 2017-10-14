@@ -31,6 +31,8 @@ def SerializeStruct(struct):
             res += 'std::string ' + field.mojom_name
         elif field.typename == 'int32':
             res += 'int ' + field.mojom_name
+        elif field.typename.endswith('[]'):
+            res += SerializeArray(field)
         else:
             res += SerializeField(field)
         if field.default_value is not None:
@@ -41,3 +43,12 @@ def SerializeStruct(struct):
 
 def SerializeField(field):
     return field.typename + ' ' + field.mojom_name
+
+def SerializeArray(field):
+    return SerializeArrayFieldName(field.typename) + field.mojom_name
+
+def SerializeArrayFieldName(typename):
+    if typename.endswith('[]'):
+        return 'std::vector<' + SerializeArrayFieldName(typename[:-2]) + '> '
+    else:
+        return typename

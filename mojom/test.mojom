@@ -5,6 +5,7 @@ import "test2.mojom";
 struct MySecondStruct {
     string mySecondStr;
     MyThirdStruct myThirdStruct;
+    array<array<uint8>> myArrayOfArrays;
 };
 
 struct MyStruct {
