@@ -1,0 +1,5 @@
+interface MyInterface {
+  enum MyEnum { VALUE };
+  const int32 kMyConst = 123;
+  MyMethod(int32 x) => (MyEnum y);
+};
