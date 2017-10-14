@@ -1,0 +1,3 @@
+struct MyThirdStruct {
+    int64 largeInt;
+};

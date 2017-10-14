@@ -1,5 +1,14 @@
-interface MyInterface {
-  enum MyEnum { VALUE };
-  const int32 kMyConst = 123;
-  MyMethod(int32 x) => (MyEnum y);
+module my_module;
+
+import "test2.mojom";
+
+struct MySecondStruct {
+    string mySecondStr;
+    MyThirdStruct myThirdStruct;
+};
+
+struct MyStruct {
+    string myStr = "hello world";
+    int32 myInt32 = 0;
+    MySecondStruct myStruct;
 };
