@@ -1,4 +1,5 @@
-from mojom.parse.ast import Mojom, Struct, StructBody, StructField, Module, Import
+from mojom.parse.ast import Struct
+
 
 def Serialize(tree, filename):
     res = ''
@@ -8,16 +9,18 @@ def Serialize(tree, filename):
         for import_item in import_list:
             res += "#include \"" + import_item.import_filename + ".h" + "\"\n"
 
+    res += '\n'
+
     if tree.module is not None:
         namespace = tree.module.mojom_namespace[1]
-        res += 'namespace ' + namespace + ' {\n'
+        res += 'namespace ' + namespace + ' {\n\n'
 
     for obj in tree.definition_list:
         if isinstance(obj, Struct):
             res += SerializeStruct(obj) + '\n'
 
     if tree.module is not None:
-        res += '}  // ' + namespace + '\n'
+        res += '\n}  // ' + namespace + '\n'
 
     file = open(filename + '.h', 'w')
     file.write(res)
@@ -25,8 +28,9 @@ def Serialize(tree, filename):
     return res
 
 def SerializeStruct(struct):
-    res = 'struct ' + struct.mojom_name + ' { '
+    res = 'struct ' + struct.mojom_name + ' {\n'
     for field in struct.body.items:
+        res += '\t'
         if field.typename == 'string':
             res += 'std::string ' + field.mojom_name
         elif field.typename == 'int32':
@@ -37,8 +41,8 @@ def SerializeStruct(struct):
             res += SerializeField(field)
         if field.default_value is not None:
             res += ' = ' + field.default_value
-        res += '; '
-    return res + '};'
+        res += ';\n'
+    return res + '\n};'
 
 
 def SerializeField(field):
