@@ -30,29 +30,26 @@ def Serialize(tree, filename):
 def SerializeStruct(struct):
     res = 'struct ' + struct.mojom_name + ' {\n'
     for field in struct.body.items:
-        res += '\t'
-        if field.typename == 'string':
-            res += 'std::string ' + field.mojom_name
-        elif field.typename == 'int32':
-            res += 'int ' + field.mojom_name
-        elif field.typename.endswith('[]'):
-            res += SerializeArray(field)
-        else:
-            res += SerializeField(field)
+        res += '\t' + SerializeTypename(field.typename) + ' ' + field.mojom_name
+
         if field.default_value is not None:
             res += ' = ' + field.default_value
+
         res += ';\n'
     return res + '\n};'
 
-
-def SerializeField(field):
-    return field.typename + ' ' + field.mojom_name
-
-def SerializeArray(field):
-    return SerializeArrayFieldName(field.typename) + field.mojom_name
-
-def SerializeArrayFieldName(typename):
-    if typename.endswith('[]'):
-        return 'std::vector<' + SerializeArrayFieldName(typename[:-2]) + '> '
+def SerializeTypename(typename):
+    if typename == 'string':
+        return 'std::string'
+    elif typename == 'int32':
+        return 'int'
+    elif typename.endswith('[]'):
+        return SerializeArrayTypename(typename)
     else:
         return typename
+
+def SerializeArrayTypename(typename):
+    if typename.endswith('[]'):
+        return 'std::vector<' + SerializeArrayTypename(typename[:-2]) + '> '
+    else:
+        return SerializeTypename(typename)

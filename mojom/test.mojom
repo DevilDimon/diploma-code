@@ -5,11 +5,12 @@ import "test2.mojom";
 struct MySecondStruct {
     string mySecondStr;
     MyThirdStruct myThirdStruct;
-    array<array<uint8>> myArrayOfArrays;
+    array<array<string>> myArrayOfArrays;
 };
 
 struct MyStruct {
     string myStr = "hello world";
     int32 myInt32 = 0;
     MySecondStruct myStruct;
+    array<array<int64, 10>, 10> myFixedLengthArray;
 };
