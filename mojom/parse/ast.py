@@ -408,3 +408,14 @@ class UnionField(Definition):
 class UnionBody(NodeListBase):
 
   _list_item_type = UnionField
+
+class Constraint(Definition):
+
+  def __init__(self, mojom_name, body, **kwargs):
+    assert isinstance(body, AttributeList)
+    super(Constraint, self).__init__(mojom_name, **kwargs)
+    self.body = body
+
+  def __eq__(self, other):
+    return super(Constraint, self).__eq__(other) and \
+      self.body == other.body

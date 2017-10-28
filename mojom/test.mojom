@@ -10,7 +10,15 @@ struct MySecondStruct {
 
 struct MyStruct {
     string myStr = "hello world";
+
+    [MyConstraint]
     int32 myInt32 = 0;
+
     MySecondStruct myStruct;
     array<array<int64, 10>, 10> myFixedLengthArray;
+};
+
+constraint MyConstraint {
+    size=32,
+    strLimit=64
 };

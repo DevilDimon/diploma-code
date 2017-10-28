@@ -115,6 +115,7 @@ class Parser(object):
   def p_definition(self, p):
     """definition : struct
                   | union
+                  | constraint
                   | interface
                   | enum
                   | const"""
@@ -205,6 +206,10 @@ class Parser(object):
   def p_union_field(self, p):
     """union_field : attribute_section typename NAME ordinal SEMI"""
     p[0] = ast.UnionField(p[3], p[1], p[4], p[2])
+
+  def p_constraint(self, p):
+    """constraint : CONSTRAINT NAME LBRACE attribute_list RBRACE SEMI"""
+    p[0] = ast.Constraint(p[2], p[4])
 
   def p_default_1(self, p):
     """default : """
@@ -454,7 +459,7 @@ def Parse(source, filename):
   lexer = Lexer(filename)
   parser = Parser(lexer, source, filename)
 
-  lex.lex(object=lexer)
+  lex.lex(object=lexer, debug=1)
   yacc.yacc(module=parser, debug=0, write_tables=0)
 
   tree = yacc.parse(source)
