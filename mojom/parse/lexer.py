@@ -66,7 +66,10 @@ class Lexer(object):
     'ARRAY',
     'MAP',
     'ASSOCIATED',
-    'CONSTRAINT'
+
+    'CONSTRAINT',
+    #'IN',
+    #'BETWEEN'
   )
 
   keyword_map = {}
@@ -106,7 +109,14 @@ class Lexer(object):
     'LBRACE', 'RBRACE',         # { }
     'LANGLE', 'RANGLE',         # < >
     'SEMI',                     # ;
-    'COMMA', 'DOT'              # , .
+    'COMMA', 'DOT',             # , .
+
+    # Comparison
+    'NOT_EQUALS',
+    'GREATER',
+    'LESSER',
+    'GREATER_OR_EQUALS',
+    'LESSER_OR_EQUALS',
   )
 
   ##
@@ -159,6 +169,12 @@ class Lexer(object):
   # hexadecimal.
   octal_or_hex_ordinal_disallowed = r'@((0[0-9]+)|('+hex_prefix+hex_digits+'))'
 
+  # States
+
+  states = [
+    ('constraints', 'exclusive')
+  ]
+
   ##
   ## Rules for the normal state
   ##
@@ -193,6 +209,17 @@ class Lexer(object):
   t_COMMA             = r','
   t_DOT               = r'\.'
   t_SEMI              = r';'
+
+  # For use in constraints state
+  t_constraints_LBRACE = r'\{'
+  t_constraints_ignore = ' \t\r'
+  t_constraints_LESSER_OR_EQUALS = r'<='
+  t_constraints_GREATER_OR_EQUALS = r'>='
+  t_constraints_EQUALS = r'='
+  t_constraints_GREATER = r'>'
+  t_constraints_LESSER = r'<'
+  t_constraints_NOT_EQUALS = r'!='
+  t_constraints_SEMI = r';'
 
   t_STRING_LITERAL    = string_literal
 
@@ -243,6 +270,8 @@ class Lexer(object):
   @TOKEN(identifier)
   def t_NAME(self, t):
     t.type = self.keyword_map.get(t.value, "NAME")
+    if t.type == 'CONSTRAINT':
+      t.lexer.begin('constraints')
     return t
 
   # Ignore C and C++ style comments
@@ -251,5 +280,42 @@ class Lexer(object):
     t.lexer.lineno += t.value.count("\n")
 
   def t_error(self, t):
+    msg = "Illegal character %s" % repr(t.value[0])
+    self._error(msg, t)
+
+  # Rules for constraint state
+
+  def t_constraints_NEWLINE(self, t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+  @TOKEN(identifier)
+  def t_constraints_NAME(self, t):
+    t.type = self.keyword_map.get(t.value, "NAME")
+    return t
+
+  def t_constraints_RBRACE(self, t):
+    r'\}'
+    t.lexer.begin('INITIAL')
+    return t
+
+  @TOKEN(floating_constant)
+  def t_constraints_FLOAT_CONST(self, t):
+    return t
+
+  @TOKEN(hex_constant)
+  def t_constraints_INT_CONST_HEX(self, t):
+    return t
+
+  @TOKEN(octal_constant_disallowed)
+  def t_constraints_OCTAL_CONSTANT_DISALLOWED(self, t):
+    msg = "Octal values not allowed"
+    self._error(msg, t)
+
+  @TOKEN(decimal_constant)
+  def t_constraints_INT_CONST_DEC(self, t):
+    return t
+
+  def t_constraints_error(self, t):
     msg = "Illegal character %s" % repr(t.value[0])
     self._error(msg, t)

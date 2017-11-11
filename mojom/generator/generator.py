@@ -1,4 +1,4 @@
-from mojom.parse.ast import Struct
+from mojom.parse.ast import Struct, Constraint, AttributeList, Attribute
 
 
 def Serialize(tree, filename):
@@ -58,17 +58,22 @@ def SerializeArrayTypename(typename):
 
 
 def GenerateSerializer(tree):
+    constraints = {}
+    for obj in tree.definition_list:
+        if isinstance(obj, Constraint):
+            constraints[obj.mojom_name] = obj.body.items
+
     res = 'namespace gene {\n\n'
     res += 'using namespace gene_internal;\n\n'
     for obj in tree.definition_list:
         if isinstance(obj, Struct):
-            res += GenerateStructSerializer(obj) + '\n}\n\n'
+            res += GenerateStructSerializer(obj, constraints) + '\n}\n\n'
     res += '\n} // gene\n'
     return res
 
 
 
-def GenerateStructSerializer(struct):
+def GenerateStructSerializer(struct, constraints):
     res = 'template <> struct serializer<' + struct.mojom_name + '> {\n'
     res += '\tbool operator()(const ' + struct.mojom_name + ' &v, container &c) {\n'
     res += '\t\treturn\n'
@@ -79,10 +84,11 @@ def GenerateStructSerializer(struct):
     #     return res
 
     for field in struct.body.items:
+        #constraint = constraints[field.attribute_list.items[0].key]
         res += '\t\t\tserialize(v.' + field.mojom_name + ', c) &&\n'
     res = res[:-4] + ';\n\t}\n'
 
-    res += '\tbool operator()(const container &c, ' + struct.mojom_name + '*v) {\n'
+    res += '\tbool operator()(const container &c, ' + struct.mojom_name + ' *v) {\n'
     res += '\t\tif (!v)\n\t\t\treturn false;\n\t\treturn \n'
     for field in struct.body.items:
         res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') &&\n'

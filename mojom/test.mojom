@@ -19,6 +19,7 @@ struct MyStruct {
 };
 
 constraint MyConstraint {
-    size=32,
-    strLimit=64
+    size = 32;
+    kek >= 1488;
+    joj != 0x228;
 };

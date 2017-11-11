@@ -412,10 +412,40 @@ class UnionBody(NodeListBase):
 class Constraint(Definition):
 
   def __init__(self, mojom_name, body, **kwargs):
-    assert isinstance(body, AttributeList)
+    assert isinstance(body, ConstraintBody)
     super(Constraint, self).__init__(mojom_name, **kwargs)
     self.body = body
 
   def __eq__(self, other):
     return super(Constraint, self).__eq__(other) and \
       self.body == other.body
+
+class ComparisonPredicate(Definition):
+
+  def __init__(self, mojom_name, comp_op, value, **kwargs):
+    assert isinstance(mojom_name, str)
+    assert isinstance(comp_op, str)
+    assert isinstance(value, str)
+    super(ComparisonPredicate, self).__init__(mojom_name, **kwargs)
+    self.comp_op = comp_op
+    self.value = value
+
+  def __eq__(self, other):
+    return super(ComparisonPredicate, self).__eq__(other) and \
+      self.comp_op == other.comp_op and \
+      self.value == other.value
+
+
+class ConstraintField(NodeBase):
+
+  def __init__(self, predicate, **kwargs):
+    super(ConstraintField, self).__init__(**kwargs)
+    self.predicate = predicate
+
+  def __eq__(self, other):
+    return super(ConstraintField, self).__eq__(other) and \
+      self.predicate == other.predicate
+
+class ConstraintBody(NodeListBase):
+
+  _list_item_type = ConstraintField

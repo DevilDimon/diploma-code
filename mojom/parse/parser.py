@@ -208,8 +208,46 @@ class Parser(object):
     p[0] = ast.UnionField(p[3], p[1], p[4], p[2])
 
   def p_constraint(self, p):
-    """constraint : CONSTRAINT NAME LBRACE attribute_list RBRACE SEMI"""
+    """constraint : CONSTRAINT NAME LBRACE constraint_body RBRACE SEMI"""
     p[0] = ast.Constraint(p[2], p[4])
+
+  def p_constraint_body_1(self, p):
+    """constraint_body : """
+    p[0] = ast.ConstraintBody()
+
+  def p_constraint_body_2(self, p):
+    """constraint_body : constraint_body constraint_field"""
+    p[0] = p[1]
+    p[1].Append(p[2])
+
+  def p_constraint_field(self, p):
+    """constraint_field : constraint_predicate SEMI"""
+    p[0] = ast.ConstraintField(p[1])
+
+  def p_constraint_predicate_1(self, p):
+    """constraint_predicate : comparison_predicate"""
+    p[0] = p[1]
+
+  # def p_constraint_predicate_2(self, p):
+  #   """constraint_predicate : between_predicate"""
+  #   p[0] = p[1]
+  #
+  # def p_constraint_predicate_3(self, p):
+  #   """constraint_predicate : in_predicate"""
+  #   p[0] = p[1]
+
+  def p_comparison_predicate(self, p):
+    """comparison_predicate : NAME comp_op int"""
+    p[0] = ast.ComparisonPredicate(p[1], p[2], p[3])
+
+  def p_comp_op(self, p):
+    """comp_op : EQUALS
+               | NOT_EQUALS
+               | GREATER
+               | LESSER
+               | LESSER_OR_EQUALS
+               | GREATER_OR_EQUALS"""
+    p[0] = p[1]
 
   def p_default_1(self, p):
     """default : """
