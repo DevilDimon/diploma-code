@@ -1,5 +1,4 @@
-from mojom.parse.ast import Struct, Constraint, AttributeList, Attribute
-
+from mojom.parse.ast import Struct, Constraint, ConstraintField, ComparisonPredicate
 
 def Serialize(tree, filename):
     res = ''
@@ -74,22 +73,72 @@ def GenerateSerializer(tree):
 
 
 def GenerateStructSerializer(struct, constraints):
+    return GenerateSerializeOperator(struct, constraints) + GenerateDeserializeOperator(struct, constraints)
+
+def GenerateSerializeOperator(struct, constraints):
     res = 'template <> struct serializer<' + struct.mojom_name + '> {\n'
     res += '\tbool operator()(const ' + struct.mojom_name + ' &v, container &c) {\n'
-    res += '\t\treturn\n'
 
     # TODO: handle empty structs here and everywhere
     # if len(struct.body.items) == 0:
     #     res += 'true;\n}'
     #     return res
 
+    field_number = 0
+    constrained_fields = set()
     for field in struct.body.items:
-        #constraint = constraints[field.attribute_list.items[0].key]
-        res += '\t\t\tserialize(v.' + field.mojom_name + ', c) &&\n'
-    res = res[:-4] + ';\n\t}\n'
+        if field.attribute_list is not None and field.attribute_list.items[0].key in constraints:
+            constraint = constraints[field.attribute_list.items[0].key]
+            vector_name = 'v' + str(field_number)
+            res += '\t\tstd::vector<constraint> ' + vector_name + ';\n'
+            for constraint_field in constraint:
+                predicate = constraint_field.predicate
+                if isinstance(predicate, ComparisonPredicate):
+                    if predicate.mojom_name == 'size':
+                        if predicate.comp_op == '=':
+                            res += '\t\t' + vector_name + '.push_back(size_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        constrained_fields.add(field_number)
+        field_number += 1
 
-    res += '\tbool operator()(const container &c, ' + struct.mojom_name + ' *v) {\n'
-    res += '\t\tif (!v)\n\t\t\treturn false;\n\t\treturn \n'
+    field_number = 0
+    res += '\n\t\treturn\n'
+
     for field in struct.body.items:
-        res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') &&\n'
+        if field_number in constrained_fields:
+            res += '\t\t\tcheck_constraints(' + field.mojom_name + ', v' + str(field_number) + ') && '
+            res += 'serialize(v.' + field.mojom_name + ', c) &&\n'
+        else:
+            res += '\t\t\tserialize(v.' + field.mojom_name + ', c) &&\n'
+        field_number += 1
+    return res[:-4] + ';\n\t}\n'
+
+def GenerateDeserializeOperator(struct, constraints):
+    res = '\tbool operator()(const container &c, ' + struct.mojom_name + ' *v) {\n'
+    res += '\t\tif (!v)\n\t\t\treturn false;\n'
+
+    field_number = 0
+    constrained_fields = set()
+    for field in struct.body.items:
+        if field.attribute_list is not None and field.attribute_list.items[0].key in constraints:
+            constraint = constraints[field.attribute_list.items[0].key]
+            vector_name = 'v' + str(field_number)
+            res += '\t\tstd::vector<constraint> ' + vector_name + ';\n'
+            for constraint_field in constraint:
+                predicate = constraint_field.predicate
+                if isinstance(predicate, ComparisonPredicate):
+                    if predicate.mojom_name == 'size':
+                        if predicate.comp_op == '=':
+                            res += '\t\t' + vector_name + '.push_back(size_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        constrained_fields.add(field_number)
+        field_number += 1
+
+    field_number = 0
+    res += '\n\t\treturn\n'
+
+    for field in struct.body.items:
+        res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') &&'
+        if field_number in constrained_fields:
+            res += ' check_constraints(' + field.mojom_name + ', v' + str(field_number) + ') &&'
+        res += '\n'
+        field_number += 1
     return res[:-4] + ';\n\t}'

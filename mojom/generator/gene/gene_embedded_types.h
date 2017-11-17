@@ -61,6 +61,4 @@ template <typename T> struct serializer<std::vector<T>> {
   }
 };
 
-
-
 }  // namespace gene_internal

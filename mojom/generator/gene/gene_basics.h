@@ -6,33 +6,37 @@ namespace gene_internal {
 using container = std::vector<uint8_t>;
 
 template <typename T> struct serializer {
-  void operator()(const T &v, container &c);
+  bool operator()(const T &v, container &c);
+  bool operator()(const container &c, T *v);
 };
 
-template <typename T> void serialize(const T &v, container &c) {
+template <typename T> bool serialize(const T &v, container &c) {
   serializer<T> serializer;
-  serializer(v, c);
+  return serializer(v, c);
 }
 
-template <typename T> struct size_checker {
-    bool check_equal_size(const T &v, uint32_t size);
-    bool check_greater_size(const T &v, uint32_t size);
-    bool check_lesser_size(const T &v, uint32_t size);
+template <typename T> bool deserialize(const container &c, T *v) {
+    serializer<T> serializer;
+    return serializer(c, v);
+}
+
+template <typename T> struct constraint {
+    virtual bool check(const T &v) const = 0;
 };
 
-template <typename T> bool check_equal_size(const T &v, uint32_t size) {
-    size_checker<T> checker;
-    return checker.check_equal_size(v, size);
-}
+template <typename T> struct size_equals_constraint : constraint {
+    uint32_t value;
+    equals_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+};
 
-template <typename T> bool check_greater_size(const T &v, uint32_t size) {
-    size_checker<T> checker;
-    return checker.check_greater_size(v, size);
-}
-
-template <typename T> bool check_lesser_size(const T &v, uint32_t size) {
-    size_checker<T> checker;
-    return checker.check_lesser_size(v, size);
+template <typename T> bool check_constraints(const T &v, std::vector<constraint> &constraints) {
+    for (const auto &c : constraints) {
+        if (!c.check(v)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 }  // namespace gene_internal

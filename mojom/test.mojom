@@ -20,6 +20,6 @@ struct MyStruct {
 
 constraint MyConstraint {
     size = 32;
-    kek >= 1488;
-    joj != 0x228;
+    value >= 1488;
+    value != 0x228;
 };

@@ -497,7 +497,7 @@ def Parse(source, filename):
   lexer = Lexer(filename)
   parser = Parser(lexer, source, filename)
 
-  lex.lex(object=lexer, debug=1)
+  lex.lex(object=lexer, debug=0)
   yacc.yacc(module=parser, debug=0, write_tables=0)
 
   tree = yacc.parse(source)
