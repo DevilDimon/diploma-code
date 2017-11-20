@@ -126,9 +126,20 @@ def GenerateDeserializeOperator(struct, constraints):
             for constraint_field in constraint:
                 predicate = constraint_field.predicate
                 if isinstance(predicate, ComparisonPredicate):
-                    if predicate.mojom_name == 'size':
+                    if predicate.mojom_name in ('size', 'value'):
+                        name = predicate.mojom_name
                         if predicate.comp_op == '=':
-                            res += '\t\t' + vector_name + '.push_back(size_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '!=':
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_not_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '<':
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_lesser_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '>':
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_greater_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '<=':
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_lesser_or_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '>=':
+                            res += '\t\t' + vector_name + '.push_back(' + name + '_greater_or_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
                         constrained_fields.add(field_number)
         field_number += 1
 

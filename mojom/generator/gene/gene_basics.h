@@ -26,9 +26,39 @@ template <typename T> struct constraint {
 
 template <typename T> struct size_equals_constraint : constraint {
     uint32_t value;
-    equals_constraint(uint32_t value) : value(value) {}
+    size_equals_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const;
 };
+
+template <typename T> struct size_not_equals_constraint : constraint {
+    uint32_t value;
+    size_not_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+};
+
+template <typename T> struct size_lesser_constraint : constraint {
+    uint32_t value;
+    size_lesser_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+}
+
+template <typename T> struct size_greater_constraint : constraint {
+    uint32_t value;
+    size_greater_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+}
+
+template <typename T> struct size_lesser_or_equals_constraint : constraint {
+    uint32_t value;
+    size_lesser_or_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+}
+
+template <typename T> struct size_greater_or_equals_constraint : constraint {
+    uint32_t value;
+    size_greater_or_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const;
+}
 
 template <typename T> bool check_constraints(const T &v, std::vector<constraint> &constraints) {
     for (const auto &c : constraints) {
