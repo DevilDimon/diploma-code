@@ -48,16 +48,16 @@ template <typename T> struct size_greater_constraint : constraint {
     bool check(const T &v) const;
 }
 
-template <typename T> struct size_lesser_or_equals_constraint : constraint {
-    uint32_t value;
-    size_lesser_or_equals_constraint(uint32_t value) : value(value) {}
-    bool check(const T &v) const;
-}
+template <typename T> struct compound_constraint : constraint {
+    constraint<T> constraint_one;
+    constraint<T> constraint_two;
 
-template <typename T> struct size_greater_or_equals_constraint : constraint {
-    uint32_t value;
-    size_greater_or_equals_constraint(uint32_t value) : value(value) {}
-    bool check(const T &v) const;
+    compound_constraint(constraint<T> constraint_one, constraint<T> constraint_two) : constraint_one(constraint_one),
+        constraint_two(constraint_two) {}
+
+    bool check(const T &v) const {
+        return constraint_one.check(v) || constraint_two.check(v);
+    }
 }
 
 template <typename T> bool check_constraints(const T &v, std::vector<constraint> &constraints) {

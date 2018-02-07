@@ -137,9 +137,13 @@ def GenerateDeserializeOperator(struct, constraints):
                         elif predicate.comp_op == '>':
                             res += '\t\t' + vector_name + '.push_back(' + name + '_greater_constraint<' + field.typename + '>(' + predicate.value + '));\n'
                         elif predicate.comp_op == '<=':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_lesser_or_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + vector_name + '.push_back(compound_constraint<' + field.typename + '>(' + \
+                                   name + '_lesser_constraint<' + field.typename + '>(' + predicate.value + '), ' + \
+                                    name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
                         elif predicate.comp_op == '>=':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_greater_or_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + vector_name + '.push_back(compound_constraint<' + field.typename + '>(' + \
+                                   name + '_greater_constraint<' + field.typename + '>(' + predicate.value + '), ' + \
+                                   name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
                         constrained_fields.add(field_number)
         field_number += 1
 
