@@ -24,6 +24,38 @@ template <typename T> struct constraint {
     virtual bool check(const T &v) const = 0;
 };
 
+template <typename T> struct value_equals_constraint : constraint {
+    T value;
+    value_equals_constraint(T value) : value(value) {}
+    bool check(const T &v) const {
+        return v == value;
+    }
+};
+
+template <typename T> struct value_not_equals_constraint : constraint {
+    T value;
+    value_not_equals_constraint(T value) : value(value) {}
+    bool check(const T &v) const {
+        return v != value;
+    }
+};
+
+template <typename T> struct value_lesser_constraint : constraint {
+    T value;
+    value_lesser_constraint(uint32_t value) : value(value) {}
+    bool check(const T &v) const {
+        return v < value;
+    }
+}
+
+template <typename T> struct value_greater_constraint : constraint {
+    T value;
+    value_greater_constraint(T value) : value(value) {}
+    bool check(const T &v) const {
+        return v > value;
+    }
+}
+
 template <typename T> struct size_equals_constraint : constraint {
     uint32_t value;
     size_equals_constraint(uint32_t value) : value(value) {}
