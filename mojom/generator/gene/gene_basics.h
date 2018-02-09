@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 
 namespace gene_internal {
@@ -24,15 +24,15 @@ template <typename T> struct constraint {
     virtual bool check(const T &v) const = 0;
 };
 
-template <typename T> struct value_equals_constraint : constraint {
-    T value;
-    value_equals_constraint(T value) : value(value) {}
-    bool check(const T &v) const {
+struct value_equals_constraint : constraint<uint32_t> {
+    uint32_t value;
+    value_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const uint32_t &v) const {
         return v == value;
     }
 };
 
-template <typename T> struct value_not_equals_constraint : constraint {
+template <typename T> struct value_not_equals_constraint : constraint<T> {
     T value;
     value_not_equals_constraint(T value) : value(value) {}
     bool check(const T &v) const {
@@ -40,47 +40,47 @@ template <typename T> struct value_not_equals_constraint : constraint {
     }
 };
 
-template <typename T> struct value_lesser_constraint : constraint {
+template <typename T> struct value_lesser_constraint : constraint<T> {
     T value;
     value_lesser_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const {
         return v < value;
     }
-}
+};
 
-template <typename T> struct value_greater_constraint : constraint {
+template <typename T> struct value_greater_constraint : constraint<T> {
     T value;
     value_greater_constraint(T value) : value(value) {}
     bool check(const T &v) const {
         return v > value;
     }
-}
+};
 
-template <typename T> struct size_equals_constraint : constraint {
+template <typename T> struct size_equals_constraint : constraint<T> {
     uint32_t value;
     size_equals_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const;
 };
 
-template <typename T> struct size_not_equals_constraint : constraint {
+template <typename T> struct size_not_equals_constraint : constraint<T> {
     uint32_t value;
     size_not_equals_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const;
 };
 
-template <typename T> struct size_lesser_constraint : constraint {
+template <typename T> struct size_lesser_constraint : constraint<T> {
     uint32_t value;
     size_lesser_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const;
-}
+};
 
-template <typename T> struct size_greater_constraint : constraint {
+template <typename T> struct size_greater_constraint : constraint<T> {
     uint32_t value;
     size_greater_constraint(uint32_t value) : value(value) {}
     bool check(const T &v) const;
-}
+};
 
-template <typename T> struct compound_constraint : constraint {
+template <typename T> struct compound_constraint : constraint<T> {
     constraint<T> constraint_one;
     constraint<T> constraint_two;
 
@@ -90,9 +90,9 @@ template <typename T> struct compound_constraint : constraint {
     bool check(const T &v) const {
         return constraint_one.check(v) || constraint_two.check(v);
     }
-}
+};
 
-template <typename T> bool check_constraints(const T &v, std::vector<constraint> &constraints) {
+template <typename T> bool check_constraints(const T &v, std::vector<constraint<T>> &constraints) {
     for (const auto &c : constraints) {
         if (!c.check(v)) {
             return false;

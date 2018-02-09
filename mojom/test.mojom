@@ -1,10 +1,10 @@
 module my_module;
 
-import "test2.mojom";
+// import "test2.mojom";
 
 struct MySecondStruct {
     string mySecondStr;
-    MyThirdStruct myThirdStruct;
+    // MyThirdStruct myThirdStruct;
     array<array<string>> myArrayOfArrays;
 };
 

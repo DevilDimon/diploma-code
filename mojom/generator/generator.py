@@ -9,6 +9,7 @@ def Serialize(tree, filename):
             res += "#include \"" + import_item.import_filename + ".h\"\n\n"
 
     res += "#include \"gene_embedded_types.h\"\n\n"
+    res += "#include <cstdint>\n\n"
 
     if tree.module is not None:
         namespace = tree.module.mojom_namespace[1]
@@ -31,7 +32,13 @@ def Serialize(tree, filename):
 def SerializeStruct(struct):
     res = 'struct ' + struct.mojom_name + ' {\n'
     for field in struct.body.items:
-        res += '\t' + SerializeTypename(field.typename) + ' ' + field.mojom_name
+        typename = SerializeTypename(field.typename)
+        array_brackets = typename.split('[')
+        res += '\t' + SerializeTypename(typename.split('[', 1)[0]) + ' ' + field.mojom_name
+        if len(array_brackets) > 1:
+            for bracket in array_brackets[1:]:
+                res += '[' + bracket
+
 
         if field.default_value is not None:
             res += ' = ' + field.default_value
@@ -43,7 +50,9 @@ def SerializeTypename(typename):
     if typename == 'string':
         return 'std::string'
     elif typename == 'int32':
-        return 'int'
+        return 'int32_t'
+    elif typename == 'int64':
+        return 'int64_t'
     elif typename.endswith('[]'):
         return SerializeArrayTypename(typename)
     else:
@@ -62,12 +71,14 @@ def GenerateSerializer(tree):
         if isinstance(obj, Constraint):
             constraints[obj.mojom_name] = obj.body.items
 
-    res = 'namespace gene {\n\n'
-    res += 'using namespace gene_internal;\n\n'
+    res = 'namespace gene_internal {\n\n'
+    if tree.module is not None:
+        res += 'using namespace ' + tree.module.mojom_namespace[1] + ';\n\n'
+
     for obj in tree.definition_list:
         if isinstance(obj, Struct):
-            res += GenerateStructSerializer(obj, constraints) + '\n}\n\n'
-    res += '\n} // gene\n'
+            res += GenerateStructSerializer(obj, constraints) + '\n};\n\n'
+    res += '\n} // gene_internal\n'
     return res
 
 
