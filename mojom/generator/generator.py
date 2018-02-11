@@ -96,19 +96,36 @@ def GenerateSerializeOperator(struct, constraints):
     #     return res
 
     field_number = 0
-    constrained_fields = set()
+    constrained_fields = {}
     for field in struct.body.items:
         if field.attribute_list is not None and field.attribute_list.items[0].key in constraints:
             constraint = constraints[field.attribute_list.items[0].key]
-            vector_name = 'v' + str(field_number)
-            res += '\t\tstd::vector<constraint> ' + vector_name + ';\n'
+            constrained_fields[field_number] = []
+            constraint_number = 0
             for constraint_field in constraint:
                 predicate = constraint_field.predicate
+                var_name = 'c' + str(field_number) + '_' + str(constraint_number)
                 if isinstance(predicate, ComparisonPredicate):
-                    if predicate.mojom_name == 'size':
+                    if predicate.mojom_name in ('size', 'value'):
                         if predicate.comp_op == '=':
-                            res += '\t\t' + vector_name + '.push_back(size_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
-                        constrained_fields.add(field_number)
+                            name = predicate.mojom_name
+                            res += '\t\t' + name + '_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
+                        elif predicate.comp_op == '!=':
+                            res += '\t\t' + name + '_not_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
+                        elif predicate.comp_op == '<':
+                            res += '\t\t' + name + '_lesser_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
+                        elif predicate.comp_op == '>':
+                            res += '\t\t' + name + '_greater_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
+                        elif predicate.comp_op == '<=':
+                            res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
+                                   name + '_lesser_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
+                                    name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
+                        elif predicate.comp_op == '>=':
+                            res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
+                                   name + '_greater_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
+                                   name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
+                        constrained_fields[field_number].append(var_name)
+                constraint_number += 1
         field_number += 1
 
     field_number = 0
@@ -116,7 +133,9 @@ def GenerateSerializeOperator(struct, constraints):
 
     for field in struct.body.items:
         if field_number in constrained_fields:
-            res += '\t\t\tcheck_constraints(' + field.mojom_name + ', v' + str(field_number) + ') && '
+            res += '\t\t\t'
+            for var in constrained_fields[field_number]:
+                res += var + '.check(v.' + field.mojom_name + ') && '
             res += 'serialize(v.' + field.mojom_name + ', c) &&\n'
         else:
             res += '\t\t\tserialize(v.' + field.mojom_name + ', c) &&\n'
@@ -128,43 +147,48 @@ def GenerateDeserializeOperator(struct, constraints):
     res += '\t\tif (!v)\n\t\t\treturn false;\n'
 
     field_number = 0
-    constrained_fields = set()
+    constrained_fields = {}
     for field in struct.body.items:
         if field.attribute_list is not None and field.attribute_list.items[0].key in constraints:
             constraint = constraints[field.attribute_list.items[0].key]
-            vector_name = 'v' + str(field_number)
-            res += '\t\tstd::vector<constraint> ' + vector_name + ';\n'
+            constrained_fields[field_number] = []
+            constraint_number = 0
             for constraint_field in constraint:
                 predicate = constraint_field.predicate
+                var_name = 'c' + str(field_number) + '_' + str(constraint_number)
                 if isinstance(predicate, ComparisonPredicate):
                     if predicate.mojom_name in ('size', 'value'):
-                        name = predicate.mojom_name
                         if predicate.comp_op == '=':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            name = predicate.mojom_name
+                            res += '\t\t' + name + '_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '!=':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_not_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + name + '_not_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '<':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_lesser_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + name + '_lesser_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '>':
-                            res += '\t\t' + vector_name + '.push_back(' + name + '_greater_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + name + '_greater_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '<=':
-                            res += '\t\t' + vector_name + '.push_back(compound_constraint<' + field.typename + '>(' + \
-                                   name + '_lesser_constraint<' + field.typename + '>(' + predicate.value + '), ' + \
-                                    name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
+                            res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
+                                   name + '_lesser_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
+                                   name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
                         elif predicate.comp_op == '>=':
-                            res += '\t\t' + vector_name + '.push_back(compound_constraint<' + field.typename + '>(' + \
-                                   name + '_greater_constraint<' + field.typename + '>(' + predicate.value + '), ' + \
-                                   name + '_equals_constraint<' + field.typename + '>(' + predicate.value + '));\n'
-                        constrained_fields.add(field_number)
+                            res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
+                                   name + '_greater_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
+                                   name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
+                        constrained_fields[field_number].append(var_name)
+                constraint_number += 1
         field_number += 1
 
     field_number = 0
     res += '\n\t\treturn\n'
 
     for field in struct.body.items:
-        res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') &&'
         if field_number in constrained_fields:
-            res += ' check_constraints(' + field.mojom_name + ', v' + str(field_number) + ') &&'
-        res += '\n'
+            res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') && '
+            for var in constrained_fields[field_number]:
+                res += var + '.check(v->' + field.mojom_name + ') && '
+            res += '\n'
+        else:
+            res += '\t\t\tdeserialize(c, &v->' + field.mojom_name + ') &&\n'
         field_number += 1
-    return res[:-4] + ';\n\t}'
+    return res[:-4] + ';\n\t}\n'
