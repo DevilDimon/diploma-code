@@ -92,8 +92,6 @@ template <typename T> struct size_greater_constraint : constraint<T> {
     }
 };
 
-// TODO: size for strings
-
 template <typename T> struct compound_constraint : constraint<T> {
     const constraint<T> &constraint_one;
     const constraint<T> &constraint_two;

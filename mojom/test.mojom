@@ -2,6 +2,8 @@ module my_module;
 
 import "test2.mojom";
 
+// TODO: all literal types
+
 struct MySecondStruct {
     string mySecondStr;
     MyThirdStruct myThirdStruct;
@@ -26,4 +28,5 @@ constraint MyConstraint {
 
 constraint MyStringConstraint {
     value < "hello world";
+    size = 12;
 };
