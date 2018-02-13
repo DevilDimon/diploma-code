@@ -10,7 +10,7 @@ struct MySecondStruct {
 
 struct MyStruct {
     [MyStringConstraint]
-    string myStr = "hello world";
+    string myStr = "hello worlc";
 
     [MyConstraint]
     int32 myInt32 = 0;
@@ -25,5 +25,5 @@ constraint MyConstraint {
 };
 
 constraint MyStringConstraint {
-    value = "hello world";
+    value < "hello world";
 };

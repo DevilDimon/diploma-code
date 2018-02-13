@@ -316,6 +316,11 @@ class Lexer(object):
   def t_constraints_INT_CONST_DEC(self, t):
     return t
 
+  @TOKEN(string_literal)
+  def t_constraints_STRING_LITERAL(self, t):
+    return t
+
+
   def t_constraints_error(self, t):
     msg = "Illegal character %s" % repr(t.value[0])
     self._error(msg, t)

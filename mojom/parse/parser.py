@@ -237,7 +237,8 @@ class Parser(object):
   #   p[0] = p[1]
 
   def p_comparison_predicate(self, p):
-    """comparison_predicate : NAME comp_op int"""
+    """comparison_predicate : NAME comp_op int
+                            | NAME comp_op STRING_LITERAL"""
     p[0] = ast.ComparisonPredicate(p[1], p[2], p[3])
 
   def p_comp_op(self, p):
