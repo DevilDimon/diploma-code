@@ -107,8 +107,8 @@ def GenerateSerializeOperator(struct, constraints):
                 var_name = 'c' + str(field_number) + '_' + str(constraint_number)
                 if isinstance(predicate, ComparisonPredicate):
                     if predicate.mojom_name in ('size', 'value'):
+                        name = predicate.mojom_name
                         if predicate.comp_op == '=':
-                            name = predicate.mojom_name
                             res += '\t\t' + name + '_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '!=':
                             res += '\t\t' + name + '_not_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
@@ -119,7 +119,7 @@ def GenerateSerializeOperator(struct, constraints):
                         elif predicate.comp_op == '<=':
                             res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
                                    name + '_lesser_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
-                                    name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
+                                   name + '_equals_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '));\n'
                         elif predicate.comp_op == '>=':
                             res += '\t\t' + 'compound_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + \
                                    name + '_greater_constraint<' + SerializeTypename(field.typename) + '>(' + predicate.value + '), ' + \
@@ -158,8 +158,8 @@ def GenerateDeserializeOperator(struct, constraints):
                 var_name = 'c' + str(field_number) + '_' + str(constraint_number)
                 if isinstance(predicate, ComparisonPredicate):
                     if predicate.mojom_name in ('size', 'value'):
+                        name = predicate.mojom_name
                         if predicate.comp_op == '=':
-                            name = predicate.mojom_name
                             res += '\t\t' + name + '_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
                         elif predicate.comp_op == '!=':
                             res += '\t\t' + name + '_not_equals_constraint<' + SerializeTypename(field.typename) + '> ' + var_name + '(' + predicate.value + ');\n'
