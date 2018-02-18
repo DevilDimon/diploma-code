@@ -1,4 +1,5 @@
 from mojom.parse.ast import Struct, Constraint, ConstraintField, ComparisonPredicate
+import uuid
 
 def Serialize(tree, filename):
     res = ''
@@ -31,6 +32,9 @@ def Serialize(tree, filename):
 
 def SerializeStruct(struct):
     res = 'struct ' + struct.mojom_name + ' {\n'
+
+    res += '\tstatic const uint64_t __type_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
+
     for field in struct.body.items:
         typename = SerializeTypename(field.typename)
         array_brackets = typename.split('[')
