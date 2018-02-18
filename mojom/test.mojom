@@ -28,5 +28,5 @@ constraint MyConstraint {
 
 constraint MyStringConstraint {
     value < "hello world";
-    size = 12;
+    size = 11;
 };

@@ -117,7 +117,7 @@ template <typename T> bool send_message(const T &v) {
 
     for (int i = 0; i < 8; i++) {
         int pos_to_move = 8 * (7 - i);
-        c.push_back((T::__type_id & (0b11111111 << pos_to_move)) >> pos_to_move);
+        c.push_back((T::__type_id & (0b11111111UL << pos_to_move)) >> pos_to_move);
     }
 
     return send_message_internal(c);
