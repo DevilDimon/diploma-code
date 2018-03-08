@@ -4,10 +4,10 @@
 using namespace my_module;
 
 int main() {
-  MyThirdStruct str{.floatVal = 22.0f}, str1{};
+  MyThirdStruct str{.smallVal = 16}, str1{};
 
   if (gene_internal::send_message(str) && gene_internal::receive_message(&str1)) {
-    std::cout << str1.floatVal << std::endl;
+    std::cout << str1.smallVal << std::endl;
   }
 
   return 0;

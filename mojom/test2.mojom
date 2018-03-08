@@ -1,5 +1,5 @@
 module my_module;
 
 struct MyThirdStruct {
-    int64 largeInt;
+    int8 smallVal;
 };
