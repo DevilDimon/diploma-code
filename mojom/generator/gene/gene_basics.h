@@ -10,7 +10,7 @@ bool receive_message_internal(container *c);
 
 template <typename T> struct serializer {
   bool operator()(const T &v, container &c);
-  bool operator()(const container &c, T *v);
+  bool operator()(container &c, T *v);
 };
 
 template <typename T> bool serialize(const T &v, container &c) {
@@ -18,7 +18,7 @@ template <typename T> bool serialize(const T &v, container &c) {
   return serializer(v, c);
 }
 
-template <typename T> bool deserialize(const container &c, T *v) {
+template <typename T> bool deserialize(container &c, T *v) {
     serializer<T> serializer;
     return serializer(c, v);
 }
@@ -115,6 +115,7 @@ template <typename T> bool send_message(const T &v) {
     if (!res)
         return false;
 
+    // Big-Endian
     for (int i = 0; i < 8; i++) {
         int pos_to_move = 8 * (7 - i);
         c.push_back((T::__type_id & (0b11111111UL << pos_to_move)) >> pos_to_move);

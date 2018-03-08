@@ -53,6 +53,10 @@ def SerializeStruct(struct):
 def SerializeTypename(typename):
     if typename == 'string':
         return 'std::string'
+    elif typename == 'int8':
+        return 'int8_t'
+    elif typename == 'int16':
+        return 'int16_t'
     elif typename == 'int32':
         return 'int32_t'
     elif typename == 'int64':
@@ -147,7 +151,7 @@ def GenerateSerializeOperator(struct, constraints):
     return res[:-4] + ';\n\t}\n'
 
 def GenerateDeserializeOperator(struct, constraints):
-    res = '\tbool operator()(const container &c, ' + struct.mojom_name + ' *v) {\n'
+    res = '\tbool operator()(container &c, ' + struct.mojom_name + ' *v) {\n'
     res += '\t\tif (!v)\n\t\t\treturn false;\n'
 
     field_number = 0

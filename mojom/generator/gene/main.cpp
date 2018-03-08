@@ -1,16 +1,13 @@
 #include <iostream>
-#include "test.mojom.h"
+#include "test2.mojom.h"
 
 using namespace my_module;
 
 int main() {
-  MyStruct str, str1;
-//  gene_internal::container c;
-//
-//  std::cout << gene_internal::serialize(str, c) << std::endl;
-//  std::cout << gene_internal::deserialize(c, &str1) << std::endl;
-  if (gene_internal::send_message(str)) {
-    std::cout << gene_internal::receive_message(&str1) << std::endl;
+  MyThirdStruct str{.floatVal = 22.0f}, str1{};
+
+  if (gene_internal::send_message(str) && gene_internal::receive_message(&str1)) {
+    std::cout << str1.floatVal << std::endl;
   }
 
   return 0;
