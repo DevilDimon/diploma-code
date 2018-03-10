@@ -9,7 +9,7 @@ namespace gene_internal {
 
 template <typename T> struct size_equals_constraint<std::vector<T>> : constraint<std::vector<T>> {
     uint32_t value;
-    size_equals_constraint(uint32_t value) : value(value) {}
+    explicit size_equals_constraint(uint32_t value) : value(value) {}
     bool check(const std::vector<T> &v) const {
         return v.size() == value;
     }
@@ -17,7 +17,7 @@ template <typename T> struct size_equals_constraint<std::vector<T>> : constraint
 
 template <typename T> struct size_not_equals_constraint<std::vector<T>> : constraint<std::vector<T>> {
     uint32_t value;
-    size_not_equals_constraint(uint32_t value) : value(value) {}
+    explicit size_not_equals_constraint(uint32_t value) : value(value) {}
     bool check(const std::vector<T> &v) const {
         return v.size() != value;
     }
@@ -25,7 +25,7 @@ template <typename T> struct size_not_equals_constraint<std::vector<T>> : constr
 
 template <typename T> struct size_lesser_constraint<std::vector<T>> : constraint<std::vector<T>> {
     uint32_t value;
-    size_lesser_constraint(uint32_t value) : value(value) {}
+    explicit size_lesser_constraint(uint32_t value) : value(value) {}
     bool check(const std::vector<T> &v) const {
         return v.size() < value;
     }
@@ -33,7 +33,7 @@ template <typename T> struct size_lesser_constraint<std::vector<T>> : constraint
 
 template <typename T> struct size_greater_constraint<std::vector<T>> : constraint<std::vector<T>> {
     uint32_t value;
-    size_greater_constraint(uint32_t value) : value(value) {}
+    explicit size_greater_constraint(uint32_t value) : value(value) {}
     bool check(const std::vector<T> &v) const {
         return v.size() > value;
     }
@@ -43,32 +43,32 @@ template <typename T> struct size_greater_constraint<std::vector<T>> : constrain
 
 template <> struct size_equals_constraint<std::string> : constraint<std::string> {
     uint32_t value;
-    size_equals_constraint(uint32_t value) : value(value) {}
-    bool check(const std::string &v) const {
+    explicit size_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const std::string &v) const override {
         return v.size() == value;
     }
 };
 
 template <> struct size_not_equals_constraint<std::string> : constraint<std::string> {
     uint32_t value;
-    size_not_equals_constraint(uint32_t value) : value(value) {}
-    bool check(const std::string &v) const {
+    explicit size_not_equals_constraint(uint32_t value) : value(value) {}
+    bool check(const std::string &v) const override {
         return v.size() != value;
     }
 };
 
 template <> struct size_lesser_constraint<std::string> : constraint<std::string> {
     uint32_t value;
-    size_lesser_constraint(uint32_t value) : value(value) {}
-    bool check(const std::string &v) const {
+    explicit size_lesser_constraint(uint32_t value) : value(value) {}
+    bool check(const std::string &v) const override {
         return v.size() < value;
     }
 };
 
 template <> struct size_greater_constraint<std::string> : constraint<std::string> {
     uint32_t value;
-    size_greater_constraint(uint32_t value) : value(value) {}
-    bool check(const std::string &v) const {
+    explicit size_greater_constraint(uint32_t value) : value(value) {}
+    bool check(const std::string &v) const override {
         return v.size() > value;
     }
 };

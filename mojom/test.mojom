@@ -7,6 +7,8 @@ import "test2.mojom";
 struct MySecondStruct {
     string mySecondStr;
     MyThirdStruct myThirdStruct;
+
+    [MyArrayConstraint]
     array<array<string>> myArrayOfArrays;
 };
 
@@ -29,4 +31,8 @@ constraint MyConstraint {
 constraint MyStringConstraint {
     value < "hello world";
     size = 11;
+};
+
+constraint MyArrayConstraint {
+    size = 2;
 };
