@@ -135,6 +135,7 @@ template <> struct serializer<std::string> {
       if (!raw_deserialize(c, &size)) {
           return false;
       }
+      *v = std::string();
       auto it = c.begin();
       while (it != c.begin() + size) {
           v->append({static_cast<char>(*it)});
@@ -166,6 +167,7 @@ template <typename T> struct serializer<std::vector<T>> {
           return false;
       }
 
+      *v = std::vector<T>();
       for (int i = 0; i < size; ++i) {
           T item;
           if (!deserialize(c, &item)) {
