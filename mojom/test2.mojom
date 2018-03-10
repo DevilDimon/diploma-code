@@ -1,5 +1,5 @@
 module my_module;
 
 struct MyThirdStruct {
-    int8 smallVal;
+    array<string> arr;
 };

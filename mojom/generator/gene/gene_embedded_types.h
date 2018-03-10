@@ -19,6 +19,7 @@ template <typename T> static bool raw_deserialize(container &c, T *v) {
     for (int i = 0; i < sizeof(T); ++i) {
         arr[i] = c[i];
     }
+    c.erase(c.begin(), c.begin() + sizeof(T));
     T *res = reinterpret_cast<T *>(arr);
     *v = *res;
     return true;
@@ -119,20 +120,62 @@ template <> struct serializer<double> {
 
 // string types
 template <> struct serializer<std::string> {
-  bool operator()(const std::string &v, container &c) { return true; }
-  bool operator()(container &c, std::string *v) const { return true; }
+  bool operator()(const std::string &v, container &c) {
+      if (!raw_serialize(v.size(), c)) {
+          return false;
+      }
+
+      for (char it : v) {
+          c.push_back(static_cast<uint8_t &&>(it));
+      }
+      return true;
+  }
+  bool operator()(container &c, std::string *v) const {
+      std::string::size_type size;
+      if (!raw_deserialize(c, &size)) {
+          return false;
+      }
+      auto it = c.begin();
+      while (it != c.begin() + size) {
+          v->append({static_cast<char>(*it)});
+          ++it;
+      }
+      c.erase(c.begin(), it);
+      return true;
+  }
 };
 
 // container types
 template <typename T> struct serializer<std::vector<T>> {
   bool operator()(const std::vector<T> &v, container &c) {
-    for (const auto &item : v) {
-      serialize(item, c);
-    }
+      if (!raw_serialize(v.size(), c)) {
+          return false;
+      }
+
+      for (const auto &item : v) {
+          if (!serialize(item, c)) {
+              return false;
+          }
+      }
 
     return true;
   }
-  bool operator()(container &c, std::vector<T> *v) const { return true; }
+  bool operator()(container &c, std::vector<T> *v) const {
+      typename std::vector<T>::size_type size;
+      if (!raw_deserialize(c, &size)) {
+          return false;
+      }
+
+      for (int i = 0; i < size; ++i) {
+          T item;
+          if (!deserialize(c, &item)) {
+              return false;
+          }
+          v->push_back(item);
+      }
+
+      return true;
+  }
 };
 
 }  // namespace gene_internal

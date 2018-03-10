@@ -4,10 +4,12 @@
 using namespace my_module;
 
 int main() {
-  MyThirdStruct str{.smallVal = 16}, str1{};
+  MyThirdStruct str{.arr = std::vector<std::string>({"hello", "world", "1"})}, str1{};
 
   if (gene_internal::send_message(str) && gene_internal::receive_message(&str1)) {
-    std::cout << str1.smallVal << std::endl;
+      for (const auto &item : str1.arr) {
+          std::cout << item << std::endl;
+      }
   }
 
   return 0;
