@@ -36,3 +36,8 @@ constraint MyStringConstraint {
 constraint MyArrayConstraint {
     size = 2;
 };
+
+interface Core {
+    Init(MyStruct a, MySecondStruct b);
+    Shutdown(MyStruct a, MySecondStruct b);
+};
