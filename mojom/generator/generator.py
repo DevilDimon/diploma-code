@@ -37,9 +37,17 @@ def Generate(tree, filename):
 
 def GenerateInterface(interface):
     res = 'class ' + interface.mojom_name + ' {\n'
+    res += '\tprotected:\n'
+    res += '\tconst uint64_t __service_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
 
     for method in interface.body.items:
-        res += '\tvirtual void ' + method.mojom_name + '('
+        res += '\tconst uint64_t __' + method.mojom_name + '_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
+
+    res += '\n'
+    res += '\tpublic:\n'
+
+    for method in interface.body.items:
+        res += '\tvirtual bool ' + method.mojom_name + '('
         for arg in method.parameter_list:
             res += GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ', '
         res = res[:-2] + ') = 0;\n'
@@ -48,12 +56,28 @@ def GenerateInterface(interface):
     return res
 
 def GenerateInterfaceUserModeClient(interface):
-    return ""
+    res = 'class ' + interface.mojom_name + 'Client final : public ' + interface.mojom_name + ' {\n'
+    res += '\tpublic:\n'
+
+    for method in interface.body.items:
+        res += '\tbool ' + method.mojom_name + '('
+        for arg in method.parameter_list:
+            res += GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ', '
+        res = res[:-2] + ') final {\n'
+        res += '\t\tgene_internal::container __c;\n'
+        res += '\t\treturn gene_internal::serialize(__service_id, __c) &&\n'
+        res += '\t\t\tgene_internal::serialize(__' + method.mojom_name + '_id, __c) &&\n'
+        for arg in method.parameter_list:
+            res += '\t\t\tgene_internal::serialize(' + arg.mojom_name + ', __c) &&\n'
+        res += '\t\t\tgene_internal::send_message_internal(__c);\n'
+        res += '\t}\n'
+    res += '};\n'
+
+    return res
+
 
 def GenerateStruct(struct):
     res = 'struct ' + struct.mojom_name + ' {\n'
-
-    res += '\tstatic const uint64_t __type_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
 
     for field in struct.body.items:
         typename = GenerateTypename(field.typename)

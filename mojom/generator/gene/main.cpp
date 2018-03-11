@@ -20,9 +20,19 @@ int main() {
 
     MyStruct str1{};
 
-  if (gene_internal::send_message(str) && gene_internal::receive_message(&str1)) {
-      std::cout << "Success" << std::endl;
-  }
+    CoreClient c;
+    if (c.Init(str, MySecondStruct{
+            .myArrayOfArrays = std::vector<std::vector<std::string>>{
+                    std::vector<std::string>{"1"},
+                    std::vector<std::string>{"2"}
+            },
+            .mySecondStr = "jorje",
+            .myThirdStruct = MyThirdStruct{
+                    .arr = std::vector<std::string>{"1", "2", "3"}
+            }
+    })) {
+        std::cout << "Success" << std::endl;
+    }
 
   return 0;
 }
