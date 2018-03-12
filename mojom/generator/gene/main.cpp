@@ -33,11 +33,16 @@ int main() {
                     .arr = std::vector<std::string>{"1", "2", "3"}
             }
     })) {
-        std::cout << "Success" << std::endl;
+        std::cout << "Success sending msg" << std::endl;
     }
 
     GeneRuntime r{};
     r.RegisterCoreHandler(new CoreServer());
+    gene_internal::container container;
+    gene_internal::receive_message_internal(&container);
+    if (r.ProcessIncomingMessage(container)) {
+        std::cout << "Success receiving and processing msg" << std::endl;
+    }
 
 
   return 0;
