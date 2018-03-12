@@ -1,8 +1,9 @@
-from mojom.parse.ast import Struct, Constraint, Interface, Method, ParameterList, ComparisonPredicate
 import uuid
 
+from mojom.parse.ast import Struct, Constraint, Interface, ComparisonPredicate
 
-def Generate(tree, filename):
+
+def GenerateDefinitions(tree, filename):
     res = ''
 
     import_list = tree.import_list
@@ -61,9 +62,13 @@ def GenerateInterfaceUserModeClient(interface):
 
     for method in interface.body.items:
         res += '\tbool ' + method.mojom_name + '('
+        is_empty = True
         for arg in method.parameter_list:
             res += GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ', '
-        res = res[:-2] + ') final {\n'
+            is_empty = False
+        if not is_empty:
+            res = res[:-2]
+        res += ') final {\n'
         res += '\t\tgene_internal::container __c;\n'
         res += '\t\treturn gene_internal::serialize(__service_id, __c) &&\n'
         res += '\t\t\tgene_internal::serialize(__' + method.mojom_name + '_id, __c) &&\n'

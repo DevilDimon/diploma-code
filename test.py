@@ -1,10 +1,16 @@
 from mojom.parse.parser import Parse
-from mojom.generator.generator import Generate
-from shutil import copy
+from mojom.generator.definitions_generator_um import GenerateDefinitions
+from mojom.generator.servers_generator_um import GenerateServers
+import shutil
+import glob
 
-filename = 'mojom/test.mojom'
-f = open(filename)
+filenames = glob.glob("mojom/*.mojom")
+for filename in filenames:
+    f = open(filename)
+    tree = Parse(f.read(), filename)
+    GenerateDefinitions(tree, filename)
+    GenerateServers(tree, filename)
+    dst = 'mojom/generator/gene'
+    shutil.copy(filename + '.h', dst)
+    shutil.copy(filename + '.server.h', dst)
 
-tree = Parse(f.read(), filename)
-print Generate(tree, filename)
-copy(filename + '.h', 'mojom/generator/gene')

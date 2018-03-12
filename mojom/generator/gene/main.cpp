@@ -1,11 +1,12 @@
 #include <iostream>
 #include "test.mojom.h"
+#include "test.mojom.server.h"
 
 using namespace my_module;
 
 int main() {
     MyStruct str = MyStruct{
-          .myInt32 = 1488,
+          .myInt32 = 0x1488,
           .myStruct = MySecondStruct{
                   .myArrayOfArrays = std::vector<std::vector<std::string>>{
                           std::vector<std::string>{"hello", "world"},
@@ -33,6 +34,8 @@ int main() {
     })) {
         std::cout << "Success" << std::endl;
     }
+
+    CoreServer s;
 
   return 0;
 }
