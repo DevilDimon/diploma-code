@@ -38,15 +38,13 @@ def GenerateDefinitions(tree, filename):
 
 def GenerateInterface(interface):
     res = 'class ' + interface.mojom_name + ' {\n'
-    res += '\tprotected:\n'
+    res += '\tpublic:\n'
     res += '\tconst uint64_t __service_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
 
     for method in interface.body.items:
-        res += '\tconst uint64_t __' + method.mojom_name + '_id = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
+        res += '\tconst uint64_t ' + GenerateMethodIdField(method) + ' = ' + str(uuid.uuid1().int >> 64) + 'UL;\n'
 
     res += '\n'
-    res += '\tpublic:\n'
-
     for method in interface.body.items:
         res += '\tvirtual bool ' + method.mojom_name + '('
         for arg in method.parameter_list:
@@ -71,7 +69,7 @@ def GenerateInterfaceUserModeClient(interface):
         res += ') final {\n'
         res += '\t\tgene_internal::container __c;\n'
         res += '\t\treturn gene_internal::serialize(__service_id, __c) &&\n'
-        res += '\t\t\tgene_internal::serialize(__' + method.mojom_name + '_id, __c) &&\n'
+        res += '\t\t\tgene_internal::serialize(' + GenerateMethodIdField(method) + ', __c) &&\n'
         for arg in method.parameter_list:
             res += '\t\t\tgene_internal::serialize(' + arg.mojom_name + ', __c) &&\n'
         res += '\t\t\tgene_internal::send_message_internal(__c);\n'
@@ -80,6 +78,8 @@ def GenerateInterfaceUserModeClient(interface):
 
     return res
 
+def GenerateMethodIdField(method):
+    return '__' + method.mojom_name + '_id'
 
 def GenerateStruct(struct):
     res = 'struct ' + struct.mojom_name + ' {\n'
