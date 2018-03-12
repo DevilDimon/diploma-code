@@ -6,7 +6,7 @@ from mojom.generator.definitions_generator_um import GenerateTypename
 from mojom.parse.ast import Struct, Constraint, Interface, ComparisonPredicate
 
 def GenerateServers(tree, filename):
-    res = ''
+    res = '#pragma once\n'
 
     import_list = tree.import_list
     if import_list is not None:

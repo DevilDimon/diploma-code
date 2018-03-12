@@ -4,7 +4,7 @@ from mojom.parse.ast import Struct, Constraint, Interface, ComparisonPredicate
 
 
 def GenerateDefinitions(tree, filename):
-    res = ''
+    res = '#pragma once\n'
 
     import_list = tree.import_list
     if import_list is not None:

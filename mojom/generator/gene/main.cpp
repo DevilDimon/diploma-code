@@ -1,6 +1,7 @@
 #include <iostream>
 #include "test.mojom.h"
 #include "test.mojom.server.h"
+#include "gene_runtime.h"
 
 using namespace my_module;
 
@@ -35,7 +36,9 @@ int main() {
         std::cout << "Success" << std::endl;
     }
 
-    CoreServer s;
+    GeneRuntime r{};
+    r.RegisterCoreHandler(new CoreServer());
+
 
   return 0;
 }
