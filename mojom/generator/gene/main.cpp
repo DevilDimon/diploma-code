@@ -6,32 +6,29 @@
 using namespace my_module;
 
 int main() {
-    MyStruct str = MyStruct{
-          .myInt32 = 0x1488,
-          .myStruct = MySecondStruct{
-                  .myArrayOfArrays = std::vector<std::vector<std::string>>{
-                          std::vector<std::string>{"hello", "world"},
-                          std::vector<std::string>{"test", "transport", "rigorously"}
-                  },
-                  .mySecondStr = "villalobos",
-                  .myThirdStruct = MyThirdStruct{
-                          .arr = std::vector<std::string>{"lol", "kek", "cheburek"}
-                  }
-          }
+    MyStruct str = {
+		"hello worlc",
+         0x1488,
+		{
+			"villalobos",
+			{std::vector<std::string>{"lol", "kek", "cheburek"}},
+			std::vector<std::vector<std::string>>{
+				std::vector<std::string>{"hello", "world"},
+				std::vector<std::string>{"test", "transport", "rigorously"}
+			}
+        }
     };
 
     MyStruct str1{};
 
     CoreClient c;
-    if (c.Init(str, MySecondStruct{
-            .myArrayOfArrays = std::vector<std::vector<std::string>>{
-                    std::vector<std::string>{"1"},
-                    std::vector<std::string>{"2"}
-            },
-            .mySecondStr = "jorje",
-            .myThirdStruct = MyThirdStruct{
-                    .arr = std::vector<std::string>{"1", "2", "3"}
-            }
+    if (c.Init(str, {
+			"jorje",
+			{ std::vector<std::string>{"1", "2", "3"} },
+			std::vector<std::vector<std::string>>{
+				std::vector<std::string>{"1"},
+				std::vector<std::string>{"2"}
+			}
     })) {
         std::cout << "Success sending msg" << std::endl;
     }
