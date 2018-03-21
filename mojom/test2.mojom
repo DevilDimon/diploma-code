@@ -1,5 +1,9 @@
 module my_module;
 
 struct MyThirdStruct {
-    array<string> arr;
+    int32 intField;
+};
+
+interface Test {
+	Init(MyThirdStruct arg);
 };

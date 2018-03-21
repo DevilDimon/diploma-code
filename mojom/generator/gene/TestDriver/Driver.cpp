@@ -5,24 +5,8 @@
 #define NTSTRSAFE_LIB
 #include <ntstrsafe.h>
 
-#define NTDEVICE_NAME_STRING      L"\\Device\\TEST"
-#define SYMBOLIC_NAME_STRING     L"\\DosDevices\\TEST"
+#include "Public.h"
 
-//
-// Device type           -- in the "User Defined" range."
-//
-#define FILEIO_TYPE 40001
-//
-// The IOCTL function codes from 0x800 to 0xFFF are for customer use.
-//
-#define IOCTL_TEST_METHOD_IN_DIRECT \
-    CTL_CODE( FILEIO_TYPE, 0x900, METHOD_IN_DIRECT, FILE_ANY_ACCESS  )
-
-#define IOCTL_TEST_METHOD_OUT_DIRECT \
-    CTL_CODE( FILEIO_TYPE, 0x901, METHOD_OUT_DIRECT , FILE_ANY_ACCESS  )
-
-#define IOCTL_TEST_METHOD_BUFFERED \
-    CTL_CODE( FILEIO_TYPE, 0x902, METHOD_BUFFERED, FILE_ANY_ACCESS  )
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD TestEvtDriverUnload;
@@ -62,7 +46,7 @@ NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath)
 		&config,
 		&hDriver);
 	if (!NT_SUCCESS(status)) {
-		KdPrint(("NonPnp: WdfDriverCreate failed with status 0x%x\n", status));
+		KdPrint(("TestDriver: WdfDriverCreate failed with status 0x%x\n", status));
 		return status;
 	}
 
@@ -260,7 +244,7 @@ VOID
 --*/
 {
 	NTSTATUS status = STATUS_SUCCESS; // Assume success
-	PCHAR inBuf = NULL, outBuf = NULL; // pointer to Input and output buffer
+	PCHAR inBuf = NULL; // pointer to Input buffer
 	PCHAR data = "this String is from Device Driver !!!";
 	ULONG datalen = (ULONG)strlen(data) + 1; //Length of data including null
 	PCHAR buffer = NULL;
@@ -270,7 +254,7 @@ VOID
 
 	PAGED_CODE();
 
-	if (!OutputBufferLength || !InputBufferLength)
+	if (!InputBufferLength)
 	{
 		WdfRequestComplete(Request, STATUS_INVALID_PARAMETER);
 		return;
@@ -307,29 +291,7 @@ VOID
 		//
 		PrintChars(inBuf, InputBufferLength);
 
-
-		status = WdfRequestRetrieveOutputBuffer(Request, 0, reinterpret_cast<PVOID *>(&outBuf), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			status = STATUS_INSUFFICIENT_RESOURCES;
-			break;
-		}
-
-		ASSERT(bufSize == OutputBufferLength);
-
-		//
-		// Writing to the buffer over-writes the input buffer content
-		//
-
-		RtlCopyMemory(outBuf, data, OutputBufferLength);
-
-		PrintChars(outBuf, datalen);
-
-		//
-		// Assign the length of the data copied to IoStatus.Information
-		// of the request and complete the request.
-		//
-		WdfRequestSetInformation(Request,
-			OutputBufferLength < datalen ? OutputBufferLength : datalen);
+		WdfRequestSetInformation(Request, 0);
 
 		//
 		// When the request is completed the content of the SystemBuffer

@@ -5,9 +5,11 @@
 #include <windows.h>
 #include <strsafe.h>
 
-#include "test.mojom.h"
-#include "test.mojom.server.h"
+#include "test2.mojom.h"
+#include "test2.mojom.server.h"
 #include "gene_runtime.h"
+
+#include "TestDriver\Public.h"
 
 using namespace my_module;
 
@@ -27,18 +29,21 @@ int main() {
     };
 
     MyStruct str1{};
+	*/
 
-    CoreClient c;
-    if (c.Init(str, {
-			"jorje",
-			{ std::vector<std::string>{"1", "2", "3"} },
-			std::vector<std::vector<std::string>>{
-				std::vector<std::string>{"1"},
-				std::vector<std::string>{"2"}
-			}
-    })) {
+	MyThirdStruct str = { 0x228 };
+	MyThirdStruct str1{};
+
+	TestClient c;
+    if (c.Init(str)) {
         std::cout << "Success sending msg" << std::endl;
     }
+	else {
+		std::cerr << "Could not send msg to driver" << std::endl;
+		return 1;
+	}
+
+	/*
 
     GeneRuntime r{};
     r.RegisterCoreHandler(new CoreServer());
@@ -48,6 +53,8 @@ int main() {
         std::cout << "Success receiving and processing msg" << std::endl;
     }
 	*/
+
+	/*
 
 	HANDLE hDevice = CreateFile("\\\\.\\TEST",
 		GENERIC_READ | GENERIC_WRITE,
@@ -76,7 +83,7 @@ int main() {
 	ULONG bytesReturned;
 
 	BOOL bRc = DeviceIoControl(hDevice,
-		(DWORD)CTL_CODE(40001, 0x902, METHOD_BUFFERED, FILE_ANY_ACCESS),
+		IOCTL_TEST_METHOD_BUFFERED,
 		InputBuffer,
 		(DWORD)strlen(InputBuffer) + 1,
 		OutputBuffer,
@@ -93,6 +100,8 @@ int main() {
 	std::cout << "    OutBuffer (" << bytesReturned << "): " << OutputBuffer << std::endl;
 
 	CloseHandle(hDevice);
+
+	*/
 
 
   return 0;

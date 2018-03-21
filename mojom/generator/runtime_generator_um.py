@@ -60,7 +60,7 @@ def GenerateMessageProcessing(trees):
             res += '\t\t\tuint64_t method_id;\n'
             res += '\t\t\tif (!gene_internal::deserialize(c, &method_id)) return false;\n'
             for method in interface.body.items:
-                res += '\t\t\t\tif (method_id == ' + GenerateFieldName(interface) + '->' + GenerateMethodIdField(method) + ') {\n'
+                res += '\t\t\tif (method_id == ' + GenerateFieldName(interface) + '->' + GenerateMethodIdField(method) + ') {\n'
                 # Deserialize parameters
                 for arg in method.parameter_list:
                     res += '\t\t\t\t\t' + GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ';\n'
@@ -74,8 +74,8 @@ def GenerateMessageProcessing(trees):
                 if not is_empty:
                     res = res[:-2]
                 res += ');\n'
-                res += '\t\t\t\t}\n'
-    res += '\t\t}\n'
+                res += '\t\t\t}\n'
+            res += '\t\t}\n'
     res += '\t\treturn true;\n'
     res += '\t}'
 
