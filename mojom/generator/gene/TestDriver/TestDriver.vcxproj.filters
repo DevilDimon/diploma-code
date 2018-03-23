@@ -32,5 +32,8 @@
     <ClInclude Include="Public.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KVector.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

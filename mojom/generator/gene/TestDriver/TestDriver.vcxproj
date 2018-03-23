@@ -159,6 +159,7 @@
     <ClCompile Include="Driver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="KVector.h" />
     <ClInclude Include="Public.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

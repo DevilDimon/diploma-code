@@ -6,6 +6,7 @@
 #include <ntstrsafe.h>
 
 #include "Public.h"
+#include "KVector.h"
 
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
@@ -250,6 +251,8 @@ VOID
 	PCHAR buffer = NULL;
 	size_t bufSize;
 
+	using namespace gene_km_internal;
+
 	UNREFERENCED_PARAMETER(Queue);
 
 	PAGED_CODE();
@@ -266,7 +269,11 @@ VOID
 
 	switch (IoControlCode)
 	{
-	case IOCTL_TEST_METHOD_BUFFERED:
+	case IOCTL_TEST_METHOD_BUFFERED: {
+
+		kvector<ULONG> vec;
+		vec.push_back(0x228);
+		vec.push_back(1488L);
 
 		//
 		// For bufffered ioctls WdfRequestRetrieveInputBuffer &
@@ -300,6 +307,7 @@ VOID
 		//
 
 		break;
+	}
 
 
 	case IOCTL_TEST_METHOD_IN_DIRECT:
