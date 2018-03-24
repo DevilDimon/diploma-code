@@ -271,9 +271,13 @@ VOID
 	{
 	case IOCTL_TEST_METHOD_BUFFERED: {
 
-		kvector<ULONG> vec;
-		vec.push_back(0x228);
-		vec.push_back(1488L);
+		{
+			kvector<ULONGLONG> vec;
+			for (int i = 0; i < 4096 / 8; i++) {
+				vec.push_back(i);
+			}
+			vec.push_back(0x228);
+		}
 
 		//
 		// For bufffered ioctls WdfRequestRetrieveInputBuffer &

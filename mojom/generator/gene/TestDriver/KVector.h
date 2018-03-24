@@ -10,55 +10,92 @@ template <typename T>
 class kvector {
 
 private:
-	T *data;
-	ULONG_PTR size;
+	T *_data;
+	ULONG_PTR _size;
 	ULONG_PTR capacity;
 	bool valid;
 
-	bool increase_capacity(ULONG_PTR extra_size) {
-		UNREFERENCED_PARAMETER(extra_size);
+	ULONG_PTR align_to_page_size(ULONG_PTR length) {
+		return (length + (PAGE_SIZE - 1)) & -PAGE_SIZE;
+	}
+
+	bool increase_capacity(ULONG_PTR num_elements) {
+		T *new_data = nullptr;
+		capacity = align_to_page_size((_size + num_elements) * sizeof(T));
+		new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
+		if (new_data == nullptr) {
+			capacity -= num_elements * sizeof(T);
+			return false;
+		}
+
+		RtlCopyMemory(new_data, _data, _size * sizeof(T));
+		ExFreePoolWithTag(_data, POOL_TAG);
+		_data = new_data;
+
 		return true;
 	}
 
 public:
 	kvector() {
-		size = 0;
+		_size = 0;
 		capacity = INITIAL_CAPACITY;
-		data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
-		valid = (data != nullptr);
+		_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
+		valid = (_data != nullptr);
 	}
 
 	bool push_back(const T &value) {
-		if ((size + 1) * sizeof(T) > capacity) {
-			bool res = increase_capacity(sizeof(T));
+		if ((_size + 1) * sizeof(T) > capacity) {
+			bool res = increase_capacity(1);
 			if (!res) {
 				return false;
 			}
 		}
 
-		RtlCopyMemory(data + size, &value, sizeof(value));
-		size += 1;
+		RtlCopyMemory(_data + _size, &value, sizeof(value));
+		_size += 1;
 		
 		return true;
 	}
 
-	T &operator[](ULONG_PTR pos) {
-		if (pos >= size || pos < 0) {
-			return nullptr;
+	bool at(ULONG_PTR pos, T *value) const {
+		if (pos >= _size || pos < 0) {
+			return false;
 		}
 
-		return data[pos];
+		*value = _data[pos];
+		return true;
+	}
+
+	bool set(ULONG_PTR pos, const T &value) {
+		if (pos >= _size || pos < 0) {
+			return false;
+		}
+
+		_data[pos] = value;
+		return true;
+	}
+
+	ULONG_PTR size() const {
+		return _size;
+	}
+
+	T *data() {
+		return _data;
+	}
+
+	const T *data() const {
+		return _data;
 	}
 
 	~kvector() {
-		if (data == nullptr) {
+		if (_data == nullptr) {
 			return;
 		}
 
-		ExFreePoolWithTag(data, POOL_TAG);
+		ExFreePoolWithTag(_data, POOL_TAG);
 
-		data = nullptr;
-		size = 0;
+		_data = nullptr;
+		_size = 0;
 		capacity = 0;
 	}
 
