@@ -39,7 +39,7 @@ template <typename T> struct size_greater_constraint<std::vector<T>> : constrain
 
 // string constraints
 
-/*
+
 
 template <> struct size_equals_constraint<std::string> : constraint<std::string> {
     uint32_t value;
@@ -72,6 +72,6 @@ template <> struct size_greater_constraint<std::string> : constraint<std::string
         return v.size() > value;
     }
 };
-*/
+
 
 }  // namespace gene_internal

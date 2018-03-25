@@ -34,6 +34,8 @@ private:
 	}
 
 public:
+	using size_type = ULONG_PTR;
+
 	class iterator {
 	private:
 		const vector<T> *vec;
@@ -52,7 +54,7 @@ public:
 			return !operator==(other);
 		}
 
-		T & operator*() const {
+		const T & operator*() const {
 			return vec->operator[](pos);
 		}
 
@@ -67,7 +69,7 @@ public:
 			return old;
 		}
 
-		iterator operator+(int shift) {
+		iterator operator+(size_t shift) {
 			iterator old = *this;
 			old.pos += shift;
 			return old;

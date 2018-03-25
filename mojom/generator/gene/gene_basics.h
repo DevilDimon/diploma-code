@@ -57,7 +57,7 @@ template <typename T> struct value_greater_constraint : constraint<T> {
     T value;
     explicit value_greater_constraint(T value) : value(value) {}
     bool check(const T &v) const {
-        return v> value;
+        return v > value;
     }
 };
 
@@ -66,7 +66,7 @@ template <typename T> struct value_greater_constraint : constraint<T> {
 template <typename T> struct size_equals_constraint : constraint<T> {
     uint32_t value;
     explicit size_equals_constraint(uint32_t value) : value(value) {}
-    bool check(const T &v) const {
+    bool check(const T &) const {
         return sizeof(T) == value;
     }
 };

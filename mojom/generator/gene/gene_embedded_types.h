@@ -118,7 +118,7 @@ template <> struct serializer<double> {
 };
 
 // string types
-/*
+
 template <> struct serializer<std::string> {
   bool operator()(const std::string &v, container &c) {
       if (!raw_serialize(v.size(), c)) {
@@ -138,14 +138,14 @@ template <> struct serializer<std::string> {
       *v = std::string();
       auto it = c.begin();
       while (it != c.begin() + size) {
-          v->append({static_cast<char>(*it)});
+          v->append(1, static_cast<char>(*it));
           ++it;
       }
       c.erase(c.begin(), it);
       return true;
   }
 };
-*/
+
 
 // container types
 template <typename T> struct serializer<std::vector<T>> {

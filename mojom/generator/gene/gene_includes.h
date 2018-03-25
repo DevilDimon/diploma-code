@@ -5,5 +5,6 @@
 #include <cstdint>
 #else
 #include "KVector.h"
+#include "KString.h"
 #include "kmstdint.h"
 #endif
