@@ -115,6 +115,7 @@
     <ClInclude Include="gene_basics.h" />
     <ClInclude Include="gene_constraints.h" />
     <ClInclude Include="gene_embedded_types.h" />
+    <ClInclude Include="gene_includes.h" />
     <ClInclude Include="gene_runtime.h" />
     <ClInclude Include="test.mojom.h" />
     <ClInclude Include="test.mojom.server.h" />

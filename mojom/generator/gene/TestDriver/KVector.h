@@ -4,16 +4,14 @@
 #define INITIAL_CAPACITY PAGE_SIZE
 #define POOL_TAG 'ceVK'
 
-namespace gene_km_internal {
+namespace std {
 
-template <typename T>
-class kvector {
+template <typename T> class vector {
 
 private:
 	T *_data;
 	ULONG_PTR _size;
-	ULONG_PTR capacity;
-	bool valid;
+	ULONG_PTR _capacity;
 
 	ULONG_PTR align_to_page_size(ULONG_PTR length) {
 		return (length + (PAGE_SIZE - 1)) & -PAGE_SIZE;
@@ -21,10 +19,10 @@ private:
 
 	bool increase_capacity(ULONG_PTR num_elements) {
 		T *new_data = nullptr;
-		capacity = align_to_page_size((_size + num_elements) * sizeof(T));
-		new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
+		_capacity = align_to_page_size((_size + num_elements) * sizeof(T));
+		new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, _capacity, POOL_TAG));
 		if (new_data == nullptr) {
-			capacity -= num_elements * sizeof(T);
+			_capacity -= num_elements * sizeof(T);
 			return false;
 		}
 
@@ -36,15 +34,54 @@ private:
 	}
 
 public:
-	kvector() {
+	class iterator {
+	private:
+		const vector<T> *vec;
+		ULONG_PTR pos;
+		friend class vector;
+	public:
+		iterator(const vector<T> *vec, ULONG_PTR pos) : vec(vec), pos(pos) {}
+
+		iterator(const iterator &other) : vec(other.vec), pos(other.pos) {}
+
+		bool operator==(const iterator &other) const {
+			return pos == other.pos;
+		}
+
+		bool operator!=(const iterator &other) const {
+			return !operator==(other);
+		}
+
+		T & operator*() const {
+			return vec->operator[](pos);
+		}
+
+		iterator &operator++() {
+			++pos;
+			return *this;
+		}
+
+		iterator operator++(int) {
+			iterator old = *this;
+			++pos;
+			return old;
+		}
+
+		iterator operator+(int shift) {
+			iterator old = *this;
+			old.pos += shift;
+			return old;
+		}
+	};
+
+	explicit vector() {
 		_size = 0;
-		capacity = INITIAL_CAPACITY;
-		_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
-		valid = (_data != nullptr);
+		_capacity = INITIAL_CAPACITY;
+		_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, _capacity, POOL_TAG));
 	}
 
 	bool push_back(const T &value) {
-		if ((_size + 1) * sizeof(T) > capacity) {
+		if ((_size + 1) * sizeof(T) > _capacity) {
 			bool res = increase_capacity(1);
 			if (!res) {
 				return false;
@@ -57,51 +94,49 @@ public:
 		return true;
 	}
 
-	bool erase(ULONG_PTR first, ULONG_PTR last) {
-		if (first >= last) {
-			return false;
+	iterator erase(iterator first, iterator last) {
+		if (first.pos >= last.pos) {
+			return last;
 		}
 
-		ULONG_PTR erased_count = last - first;
+		ULONG_PTR erased_count = last.pos - first.pos;
 
-		if (align_to_page_size((_size - erased_count) * sizeof(T)) < capacity) {
+		if (align_to_page_size((_size - erased_count) * sizeof(T)) < _capacity) {
 			T *new_data = nullptr;
-			capacity = align_to_page_size((_size - erased_count) * sizeof(T));
-			new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
+			_capacity = align_to_page_size((_size - erased_count) * sizeof(T));
+			new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, _capacity, POOL_TAG));
 			if (new_data == nullptr) {
-				capacity += erased_count * sizeof(T);
-				return false;
+				_capacity += erased_count * sizeof(T);
+				return last;
 			}
 
-			RtlCopyMemory(new_data, _data, first * sizeof(T));
-			RtlCopyMemory(new_data + first, _data + last, (_size - last) * sizeof(T));
+			RtlCopyMemory(new_data, _data, first.pos * sizeof(T));
+			RtlCopyMemory(new_data + first.pos, _data + last.pos, (_size - last.pos) * sizeof(T));
 			ExFreePoolWithTag(_data, POOL_TAG);
 			_data = new_data;
 		}
 		else {
-			RtlMoveMemory(_data + first, _data + last, (_size - erased_count) * sizeof(T));
+			RtlMoveMemory(_data + first.pos, _data + last.pos, (_size - erased_count) * sizeof(T));
 		}
 
 		_size -= erased_count;
-		return true;
+		return first + 1;
 	}
 
-	bool at(ULONG_PTR pos, T *value) const {
-		if (pos >= _size || pos < 0) {
-			return false;
-		}
-
-		*value = _data[pos];
-		return true;
+	iterator begin() const {
+		return iterator(this, 0);
 	}
 
-	bool set(ULONG_PTR pos, const T &value) {
-		if (pos >= _size || pos < 0) {
-			return false;
-		}
+	iterator end() const {
+		return iterator(this, _size);
+	}
 
-		_data[pos] = value;
-		return true;
+	const T &operator[](ULONG_PTR pos) const {
+		return _data[pos];
+	}
+
+	T &operator[](ULONG_PTR pos) {
+		return _data[pos];
 	}
 
 	ULONG_PTR size() const {
@@ -116,7 +151,7 @@ public:
 		return _data;
 	}
 
-	~kvector() {
+	~vector() {
 		if (_data == nullptr) {
 			return;
 		}
@@ -125,9 +160,9 @@ public:
 
 		_data = nullptr;
 		_size = 0;
-		capacity = 0;
+		_capacity = 0;
 	}
 
 };
 
-} // namespace gene_km_internal
+} // namespace std

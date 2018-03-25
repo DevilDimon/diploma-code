@@ -1,6 +1,5 @@
 #pragma once
-#include <cstdint>
-#include <vector>
+#include "gene_includes.h"
 
 namespace gene_internal {
 

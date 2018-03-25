@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <vector>
 
 #include "gene_constraints.h"
 
@@ -120,6 +118,7 @@ template <> struct serializer<double> {
 };
 
 // string types
+/*
 template <> struct serializer<std::string> {
   bool operator()(const std::string &v, container &c) {
       if (!raw_serialize(v.size(), c)) {
@@ -146,6 +145,7 @@ template <> struct serializer<std::string> {
       return true;
   }
 };
+*/
 
 // container types
 template <typename T> struct serializer<std::vector<T>> {

@@ -47,5 +47,8 @@
     <ClInclude Include="test2.mojom.server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="gene_includes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

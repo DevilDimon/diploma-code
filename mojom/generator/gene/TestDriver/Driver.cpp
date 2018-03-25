@@ -7,12 +7,30 @@
 
 #include "Public.h"
 #include "KVector.h"
-#include "gene_km_embedded_types.h"
+#include "..\gene_embedded_types.h"
 
 struct MyThirdStruct {
 	INT32 intField;
 };
 
+namespace gene_internal {
+template <> struct serializer<MyThirdStruct> {
+	bool operator()(const MyThirdStruct &v, container &c) {
+
+		return
+			serialize(v.intField, c);
+	}
+	bool operator()(container &c, MyThirdStruct *v) {
+		if (!v)
+			return false;
+
+		return
+			deserialize(c, &v->intField);
+	}
+
+};
+
+}
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD TestEvtDriverUnload;
@@ -256,8 +274,6 @@ VOID
 	PCHAR buffer = nullptr;
 	size_t bufSize;
 
-	using namespace gene_km_internal;
-
 	UNREFERENCED_PARAMETER(Queue);
 
 	PAGED_CODE();
@@ -288,23 +304,23 @@ VOID
 			break;
 		}
 
-		kvector<UINT8> c;
+		std::vector<uint8_t> c;
 		for (int i = 0; i < bufSize; ++i) {
 			c.push_back(inBuf[i]);
 		}
 		
 		UINT64 service_id;
-		if (!deserialize(c, &service_id)) {
+		if (!gene_internal::deserialize(c, &service_id)) {
 			DbgBreakPoint();
 		}
 		UINT64 method_id;
-		if (!deserialize(c, &method_id)) {
+		if (!gene_internal::deserialize(c, &method_id)) {
 			DbgBreakPoint();
 		}
 
 		MyThirdStruct str{};
 
-		if (!deserialize(c, &str)) {
+		if (!gene_internal::deserialize(c, &str)) {
 			DbgBreakPoint();
 		}
 

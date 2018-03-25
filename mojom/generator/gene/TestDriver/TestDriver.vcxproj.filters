@@ -27,9 +27,6 @@
     <ClCompile Include="Driver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gene_km_basics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public.h">
@@ -38,13 +35,7 @@
     <ClInclude Include="KVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="gene_km_basics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gene_km_embedded_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="gene_km_constraints.h">
+    <ClInclude Include="kmstdint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

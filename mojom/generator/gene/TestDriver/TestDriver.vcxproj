@@ -147,6 +147,8 @@
     </Link>
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>GENE_KERNEL_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -157,12 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp" />
-    <ClCompile Include="gene_km_basics.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gene_km_basics.h" />
-    <ClInclude Include="gene_km_constraints.h" />
-    <ClInclude Include="gene_km_embedded_types.h" />
+    <ClInclude Include="kmstdint.h" />
     <ClInclude Include="KVector.h" />
     <ClInclude Include="Public.h" />
   </ItemGroup>
