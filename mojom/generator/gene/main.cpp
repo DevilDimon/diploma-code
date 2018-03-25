@@ -54,55 +54,6 @@ int main() {
     }
 	*/
 
-	/*
-
-	HANDLE hDevice = CreateFile("\\\\.\\TEST",
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		NULL,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
-
-	if (hDevice == INVALID_HANDLE_VALUE) {
-		std::cout << "Error: CreateFile Failed : " << GetLastError() << std::endl;
-		return 7;
-	}
-
-	char OutputBuffer[100];
-	char InputBuffer[100];
-
-	if (FAILED(StringCchCopy(InputBuffer, sizeof(InputBuffer),
-		"this String is from User Application; using METHOD_BUFFERED"))) {
-		return 7;
-	}
-
-	std::cout << "Calling DeviceIoControl..." << std::endl;
-	memset(OutputBuffer, 0, sizeof(OutputBuffer));
-
-	ULONG bytesReturned;
-
-	BOOL bRc = DeviceIoControl(hDevice,
-		IOCTL_TEST_METHOD_BUFFERED,
-		InputBuffer,
-		(DWORD)strlen(InputBuffer) + 1,
-		OutputBuffer,
-		sizeof(OutputBuffer),
-		&bytesReturned,
-		NULL);
-
-	if (!bRc)
-	{
-		std::cout << "Error in DeviceIoControl : " << GetLastError() << std::endl;
-		return 7;
-
-	}
-	std::cout << "    OutBuffer (" << bytesReturned << "): " << OutputBuffer << std::endl;
-
-	CloseHandle(hDevice);
-
-	*/
-
 
   return 0;
 }

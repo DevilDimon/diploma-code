@@ -57,6 +57,35 @@ public:
 		return true;
 	}
 
+	bool erase(ULONG_PTR first, ULONG_PTR last) {
+		if (first >= last) {
+			return false;
+		}
+
+		ULONG_PTR erased_count = last - first;
+
+		if (align_to_page_size((_size - erased_count) * sizeof(T)) < capacity) {
+			T *new_data = nullptr;
+			capacity = align_to_page_size((_size - erased_count) * sizeof(T));
+			new_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, capacity, POOL_TAG));
+			if (new_data == nullptr) {
+				capacity += erased_count * sizeof(T);
+				return false;
+			}
+
+			RtlCopyMemory(new_data, _data, first * sizeof(T));
+			RtlCopyMemory(new_data + first, _data + last, (_size - last) * sizeof(T));
+			ExFreePoolWithTag(_data, POOL_TAG);
+			_data = new_data;
+		}
+		else {
+			RtlMoveMemory(_data + first, _data + last, (_size - erased_count) * sizeof(T));
+		}
+
+		_size -= erased_count;
+		return true;
+	}
+
 	bool at(ULONG_PTR pos, T *value) const {
 		if (pos >= _size || pos < 0) {
 			return false;

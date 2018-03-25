@@ -7,6 +7,11 @@
 
 #include "Public.h"
 #include "KVector.h"
+#include "gene_km_embedded_types.h"
+
+struct MyThirdStruct {
+	INT32 intField;
+};
 
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
@@ -245,10 +250,10 @@ VOID
 --*/
 {
 	NTSTATUS status = STATUS_SUCCESS; // Assume success
-	PCHAR inBuf = NULL; // pointer to Input buffer
+	PCHAR inBuf = nullptr; // pointer to Input buffer
 	PCHAR data = "this String is from Device Driver !!!";
 	ULONG datalen = (ULONG)strlen(data) + 1; //Length of data including null
-	PCHAR buffer = NULL;
+	PCHAR buffer = nullptr;
 	size_t bufSize;
 
 	using namespace gene_km_internal;
@@ -271,14 +276,6 @@ VOID
 	{
 	case IOCTL_TEST_METHOD_BUFFERED: {
 
-		{
-			kvector<ULONGLONG> vec;
-			for (int i = 0; i < 4096 / 8; i++) {
-				vec.push_back(i);
-			}
-			vec.push_back(0x228);
-		}
-
 		//
 		// For bufffered ioctls WdfRequestRetrieveInputBuffer &
 		// WdfRequestRetrieveOutputBuffer return the same buffer
@@ -290,6 +287,29 @@ VOID
 			status = STATUS_INSUFFICIENT_RESOURCES;
 			break;
 		}
+
+		kvector<UINT8> c;
+		for (int i = 0; i < bufSize; ++i) {
+			c.push_back(inBuf[i]);
+		}
+		
+		UINT64 service_id;
+		if (!deserialize(c, &service_id)) {
+			DbgBreakPoint();
+		}
+		UINT64 method_id;
+		if (!deserialize(c, &method_id)) {
+			DbgBreakPoint();
+		}
+
+		MyThirdStruct str{};
+
+		if (!deserialize(c, &str)) {
+			DbgBreakPoint();
+		}
+
+		DbgBreakPoint();
+		
 
 		ASSERT(bufSize == InputBufferLength);
 
