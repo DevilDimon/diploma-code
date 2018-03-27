@@ -378,9 +378,9 @@ VOID
 		uint64_t method_id;
 		if (!gene_internal::deserialize(c, &method_id)) DbgBreakPoint();
 		MyStruct a;
-		DbgBreakPoint();
 		if (!gene_internal::deserialize(c, &a)) DbgBreakPoint();
 		MySecondStruct b;
+		DbgBreakPoint();
 		if (!gene_internal::deserialize(c, &b)) DbgBreakPoint();
 
 		DbgBreakPoint();

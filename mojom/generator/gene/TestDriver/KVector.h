@@ -101,7 +101,7 @@ public:
 			}
 		}
 
-		RtlCopyMemory(_data + _size, &value, sizeof(T));
+		_data[_size] = value;
 		_size += 1;
 		
 		return true;
