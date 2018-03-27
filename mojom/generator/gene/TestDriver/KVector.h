@@ -82,6 +82,17 @@ public:
 		_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, _capacity, POOL_TAG));
 	}
 
+	vector<T> &operator=(const vector<T> &other) {
+		if (other._data) {
+			_data = static_cast<T *>(ExAllocatePoolWithTag(PagedPool, other._capacity, POOL_TAG));
+			RtlCopyMemory(_data, other._data, other._capacity);
+		}
+
+		_capacity = other._capacity;
+		_size = other._size;
+		return *this;
+	}
+
 	bool push_back(const T &value) {
 		if ((_size + 1) * sizeof(T) > _capacity) {
 			bool res = increase_capacity(1);
@@ -90,7 +101,7 @@ public:
 			}
 		}
 
-		RtlCopyMemory(_data + _size, &value, sizeof(value));
+		RtlCopyMemory(_data + _size, &value, sizeof(T));
 		_size += 1;
 		
 		return true;
