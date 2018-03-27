@@ -34,8 +34,9 @@ string::string(string &&other) {
 
 string &string::operator=(const string &other) {
 	if (other.str) {
-		str = static_cast<char *>(ExAllocatePoolWithTag(PagedPool, other.len, POOL_TAG));
+		str = static_cast<char *>(ExAllocatePoolWithTag(PagedPool, other.len + 1, POOL_TAG));
 		RtlCopyMemory(str, other.str, other.len);
+		str[other.len] = '\0';
 	}
 	len = other.len;
 	return *this;
