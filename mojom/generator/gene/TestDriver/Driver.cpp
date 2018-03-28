@@ -9,92 +9,7 @@
 #include "KVector.h"
 #include "..\gene_embedded_types.h"
 
-struct MyThirdStruct {
-	int32_t intField;
-};
-
-struct MySecondStruct {
-	std::string mySecondStr;
-	MyThirdStruct myThirdStruct;
-	std::vector<std::vector<std::string> >  myArrayOfArrays;
-
-};
-struct MyStruct {
-	std::string myStr = "hello worlc";
-	int32_t myInt32 = 0;
-	MySecondStruct myStruct;
-
-};
-
-namespace gene_internal {
-
-template <> struct serializer<MyThirdStruct> {
-	bool operator()(const MyThirdStruct &v, container &c) {
-
-		return
-			serialize(v.intField, c);
-	}
-	bool operator()(container &c, MyThirdStruct *v) {
-		if (!v)
-			return false;
-
-		return
-			deserialize(c, &v->intField);
-	}
-
-};
-
-template <> struct serializer<MySecondStruct> {
-	bool operator()(const MySecondStruct &v, container &c) {
-		size_equals_constraint<std::vector<std::vector<std::string> > > c2_0(2);
-
-		return
-			serialize(v.mySecondStr, c) &&
-			serialize(v.myThirdStruct, c) &&
-			c2_0.check(v.myArrayOfArrays) && serialize(v.myArrayOfArrays, c);
-	}
-	bool operator()(container &c, MySecondStruct *v) {
-		if (!v)
-			return false;
-		size_equals_constraint<std::vector<std::vector<std::string> > > c2_0(2);
-
-		return
-			deserialize(c, &v->mySecondStr) &&
-			deserialize(c, &v->myThirdStruct) &&
-			deserialize(c, &v->myArrayOfArrays) && c2_0.check(v->myArrayOfArrays);
-	}
-
-};
-
-template <> struct serializer<MyStruct> {
-	bool operator()(const MyStruct &v, container &c) {
-		value_lesser_constraint<std::string> c0_0("hello world");
-		size_equals_constraint<std::string> c0_1(11);
-		size_equals_constraint<int32_t> c1_0(4);
-		value_not_equals_constraint<int32_t> c1_1(1);
-
-		return
-			c0_0.check(v.myStr) && c0_1.check(v.myStr) && serialize(v.myStr, c) &&
-			c1_0.check(v.myInt32) && c1_1.check(v.myInt32) && serialize(v.myInt32, c) &&
-			serialize(v.myStruct, c);
-	}
-	bool operator()(container &c, MyStruct *v) {
-		if (!v)
-			return false;
-		value_lesser_constraint<std::string> c0_0("hello world");
-		size_equals_constraint<std::string> c0_1(11);
-		size_equals_constraint<int32_t> c1_0(4);
-		value_not_equals_constraint<int32_t> c1_1(1);
-
-		return
-			deserialize(c, &v->myStr) && c0_0.check(v->myStr) && c0_1.check(v->myStr) &&
-			deserialize(c, &v->myInt32) && c1_0.check(v->myInt32) && c1_1.check(v->myInt32) &&
-			deserialize(c, &v->myStruct);
-	}
-
-};
-
-}
+#include "..\test.mojom.h"
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD TestEvtDriverUnload;
@@ -377,9 +292,9 @@ VOID
 		if (!gene_internal::deserialize(c, &service_id)) DbgBreakPoint();
 		uint64_t method_id;
 		if (!gene_internal::deserialize(c, &method_id)) DbgBreakPoint();
-		MyStruct a;
+		my_module::MyStruct a;
 		if (!gene_internal::deserialize(c, &a)) DbgBreakPoint();
-		MySecondStruct b;
+		my_module::MySecondStruct b;
 		DbgBreakPoint();
 		if (!gene_internal::deserialize(c, &b)) DbgBreakPoint();
 

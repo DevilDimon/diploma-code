@@ -12,7 +12,6 @@ def GenerateDefinitions(tree, filename):
             res += "#include \"" + import_item.import_filename + ".h\"\n\n"
 
     res += "#include \"gene_embedded_types.h\"\n\n"
-    res += "#include <cstdint>\n\n"
 
     if tree.module is not None:
         namespace = tree.module.mojom_namespace[1]

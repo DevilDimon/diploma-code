@@ -1,6 +1,6 @@
 from mojom.parse.parser import Parse
-from mojom.generator.definitions_generator_um import GenerateDefinitions
-from mojom.generator.servers_generator_um import GenerateServers
+from mojom.generator.definitions_generator import GenerateDefinitions
+from mojom.generator.servers_generator import GenerateServers
 from mojom.generator.runtime_generator_um import GenerateRuntime
 import shutil
 import glob
