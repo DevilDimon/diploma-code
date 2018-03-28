@@ -44,5 +44,8 @@
     <ClInclude Include="KString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="libc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

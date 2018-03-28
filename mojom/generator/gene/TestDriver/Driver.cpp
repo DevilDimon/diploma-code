@@ -9,6 +9,7 @@
 #include "KVector.h"
 #include "..\gene_embedded_types.h"
 
+#include "..\gene_runtime.h"
 #include "..\test.mojom.h"
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
@@ -18,6 +19,8 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL FileEvtIoDeviceControl;
 
 extern "C" NTSTATUS TestDeviceAdd(IN WDFDRIVER Driver, IN PWDFDEVICE_INIT DeviceInit);
 VOID PrintChars(_In_reads_(CountChars) PCHAR BufferAddress, _In_ size_t CountChars);
+
+GeneRuntime gene_runtime;
 
 NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath) 
 {
@@ -73,6 +76,21 @@ NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath)
 	// software device.
 	//
 	status = TestDeviceAdd(hDriver, pInit);
+
+	class CoreImpl : public Core {
+		bool Init(MyStruct a, MySecondStruct b) override {
+			DbgBreakPoint();
+			return true;
+		}
+
+		bool Shutdown(MyStruct a, MySecondStruct b) override {
+			DbgBreakPoint();
+			return true;
+		}
+	};
+
+	gene_runtime = GeneRuntime();
+	gene_runtime.RegisterCoreHandler(new CoreImpl());
 
 	return status;
 }
@@ -283,20 +301,12 @@ VOID
 			break;
 		}
 
-		std::vector<uint8_t> c;
+		gene_internal::container c;
 		for (int i = 0; i < bufSize; ++i) {
 			c.push_back(inBuf[i]);
 		}
 		
-		uint64_t service_id;
-		if (!gene_internal::deserialize(c, &service_id)) DbgBreakPoint();
-		uint64_t method_id;
-		if (!gene_internal::deserialize(c, &method_id)) DbgBreakPoint();
-		my_module::MyStruct a;
-		if (!gene_internal::deserialize(c, &a)) DbgBreakPoint();
-		my_module::MySecondStruct b;
-		DbgBreakPoint();
-		if (!gene_internal::deserialize(c, &b)) DbgBreakPoint();
+		gene_runtime.ProcessIncomingMessage(c);
 
 		DbgBreakPoint();
 		

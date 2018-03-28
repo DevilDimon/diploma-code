@@ -162,6 +162,7 @@
     <ClCompile Include="KString.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libc.h" />
     <ClInclude Include="kmstdint.h" />
     <ClInclude Include="KString.h" />
     <ClInclude Include="KVector.h" />
