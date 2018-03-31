@@ -30,6 +30,9 @@
     <ClCompile Include="KString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="libc.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public.h">

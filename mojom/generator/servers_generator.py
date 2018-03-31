@@ -2,7 +2,7 @@ import uuid
 
 import os
 
-from mojom.generator.definitions_generator_um import GenerateTypename
+from mojom.generator.definitions_generator import GenerateTypename
 from mojom.parse.ast import Struct, Constraint, Interface, ComparisonPredicate
 
 def GenerateServers(tree, filename):

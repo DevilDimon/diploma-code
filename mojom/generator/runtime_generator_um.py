@@ -1,7 +1,7 @@
 import os
 
 from mojom.parse.ast import Interface
-from mojom.generator.definitions_generator_um import GenerateMethodIdField, GenerateTypename
+from mojom.generator.definitions_generator import GenerateMethodIdField, GenerateTypename
 
 
 def GenerateRuntime(trees, filenames):

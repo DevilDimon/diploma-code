@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="KString.cpp" />
+    <ClCompile Include="libc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libc.h" />
