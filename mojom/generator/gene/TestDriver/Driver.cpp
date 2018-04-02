@@ -78,12 +78,16 @@ NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath)
 	status = TestDeviceAdd(hDriver, pInit);
 
 	class CoreImpl : public Core {
-		bool Init(MyStruct a, MySecondStruct b) override {
+		bool Init(const MyStruct &a, const MySecondStruct &b) override {
+			UNREFERENCED_PARAMETER(a);
+			UNREFERENCED_PARAMETER(b);
 			DbgBreakPoint();
 			return true;
 		}
 
-		bool Shutdown(MyStruct a, MySecondStruct b) override {
+		bool Shutdown(const MyStruct &a, const MySecondStruct &b) override {
+			UNREFERENCED_PARAMETER(a);
+			UNREFERENCED_PARAMETER(b);
 			DbgBreakPoint();
 			return true;
 		}

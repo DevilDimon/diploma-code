@@ -10,7 +10,7 @@ def GenerateRuntime(trees, filenames):
         res += '#include \"' + os.path.basename(os.path.normpath(filename)) + '.h\"\n'
 
     res += '\n'
-    res += '#include <cstdint>\n\n'
+    res += '#include \"gene_includes.h\"\n\n'
     for namespace in set(map(lambda t: t.module.mojom_namespace[1], filter(lambda t: t.module is not None, trees))):
         res += 'using namespace ' + namespace + ';\n'
     res += '\n'
@@ -55,7 +55,7 @@ def GenerateMessageProcessing(trees):
     res += '\t\tif (!gene_internal::deserialize(c, &service_id)) return false;\n'
     for tree in trees:
         for interface in filter(lambda obj: isinstance(obj, Interface), tree.definition_list):
-            res += '\t\tif (service_id == ' + GenerateFieldName(interface) + '->__service_id) {\n'
+            res += '\t\tif (' + GenerateFieldName(interface) + ' && service_id == ' + GenerateFieldName(interface) + '->__service_id) {\n'
             # Get method id
             res += '\t\t\tuint64_t method_id;\n'
             res += '\t\t\tif (!gene_internal::deserialize(c, &method_id)) return false;\n'

@@ -47,7 +47,7 @@ def GenerateInterface(interface):
     for method in interface.body.items:
         res += '\tvirtual bool ' + method.mojom_name + '('
         for arg in method.parameter_list:
-            res += GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ', '
+            res += 'const ' + GenerateTypename(arg.typename) + ' &' + arg.mojom_name + ', '
         res = res[:-2] + ') = 0;\n'
     res += '\n};'
 
@@ -61,7 +61,7 @@ def GenerateInterfaceUserModeClient(interface):
         res += '\tbool ' + method.mojom_name + '('
         is_empty = True
         for arg in method.parameter_list:
-            res += GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ', '
+            res += 'const ' + GenerateTypename(arg.typename) + ' &' + arg.mojom_name + ', '
             is_empty = False
         if not is_empty:
             res = res[:-2]
