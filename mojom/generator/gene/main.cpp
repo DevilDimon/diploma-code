@@ -9,8 +9,6 @@
 #include "test.mojom.server.h"
 #include "gene_runtime.h"
 
-#include "TestDriver\Public.h"
-
 using namespace my_module;
 
 int main() {

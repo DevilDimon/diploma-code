@@ -15,10 +15,9 @@
 extern "C" DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD TestEvtDriverUnload;
 EVT_WDF_DEVICE_SHUTDOWN_NOTIFICATION TestShutdown;
-EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL FileEvtIoDeviceControl;
+EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL DrvEvtIoDeviceControl;
 
 extern "C" NTSTATUS TestDeviceAdd(IN WDFDRIVER Driver, IN PWDFDEVICE_INIT DeviceInit);
-VOID PrintChars(_In_reads_(CountChars) PCHAR BufferAddress, _In_ size_t CountChars);
 
 GeneRuntime gene_runtime;
 
@@ -182,7 +181,7 @@ STATUS_SUCCESS if initialized; an error otherwise.
 	WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&ioQueueConfig,
 		WdfIoQueueDispatchSequential);
 
-	ioQueueConfig.EvtIoDeviceControl = FileEvtIoDeviceControl;
+	ioQueueConfig.EvtIoDeviceControl = DrvEvtIoDeviceControl;
 
 	WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
 	//
@@ -240,7 +239,7 @@ End:
 
 }
 
-VOID FileEvtIoDeviceControl(IN WDFQUEUE Queue, IN WDFREQUEST Request, IN size_t OutputBufferLength,
+VOID DrvEvtIoDeviceControl(IN WDFQUEUE Queue, IN WDFREQUEST Request, IN size_t OutputBufferLength,
 	IN size_t InputBufferLength, IN ULONG IoControlCode)
 /*++
 Routine Description:
@@ -270,12 +269,10 @@ VOID
 {
 	NTSTATUS status = STATUS_SUCCESS; // Assume success
 	PCHAR inBuf = nullptr; // pointer to Input buffer
-	PCHAR data = "this String is from Device Driver !!!";
-	ULONG datalen = (ULONG)strlen(data) + 1; //Length of data including null
-	PCHAR buffer = nullptr;
 	size_t bufSize;
 
 	UNREFERENCED_PARAMETER(Queue);
+	UNREFERENCED_PARAMETER(OutputBufferLength);
 
 	PAGED_CODE();
 
@@ -317,15 +314,6 @@ VOID
 
 		ASSERT(bufSize == InputBufferLength);
 
-		//
-		// Read the input buffer content.
-		// We are using the following function to print characters instead
-		// TraceEvents with %s format because the string we get may or
-		// may not be null terminated. The buffer may contain non-printable
-		// characters also.
-		//
-		PrintChars(inBuf, InputBufferLength);
-
 		WdfRequestSetInformation(Request, 0);
 
 		//
@@ -337,98 +325,6 @@ VOID
 		break;
 	}
 
-
-	case IOCTL_TEST_METHOD_IN_DIRECT:
-
-		//
-		// Get the Input buffer. WdfRequestRetrieveInputBuffer returns
-		// Irp->AssociatedIrp.SystemBuffer.
-		//
-		status = WdfRequestRetrieveInputBuffer(Request, 0, reinterpret_cast<PVOID *>(&inBuf), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			status = STATUS_INSUFFICIENT_RESOURCES;
-			break;
-		}
-
-		ASSERT(bufSize == InputBufferLength);
-
-		PrintChars(inBuf, InputBufferLength);
-
-		//
-		// Get the output buffer. Framework calls MmGetSystemAddressForMdlSafe
-		// on the Irp->MdlAddress and returns the system address.
-		// Oddity: For this method, this buffer is intended for transfering data
-		// from the application to the driver.
-		//
-
-		status = WdfRequestRetrieveOutputBuffer(Request, 0, reinterpret_cast<PVOID *>(&buffer), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			break;
-		}
-
-		ASSERT(bufSize == OutputBufferLength);
-
-		PrintChars(buffer, OutputBufferLength);
-
-		//
-		// Return total bytes read from the output buffer.
-		// Note OutputBufferLength = MmGetMdlByteCount(Irp->MdlAddress)
-		//
-
-		WdfRequestSetInformation(Request, OutputBufferLength);
-
-		//
-		// NOTE: Changes made to the  SystemBuffer are not copied
-		// to the user input buffer by the I/O manager
-		//
-
-		break;
-
-	case IOCTL_TEST_METHOD_OUT_DIRECT:
-
-		//
-		// Get the Input buffer. WdfRequestRetrieveInputBuffer returns
-		// Irp->AssociatedIrp.SystemBuffer.
-		//
-		status = WdfRequestRetrieveInputBuffer(Request, 0, reinterpret_cast<PVOID *>(&inBuf), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			status = STATUS_INSUFFICIENT_RESOURCES;
-			break;
-		}
-
-		ASSERT(bufSize == InputBufferLength);
-
-		PrintChars(inBuf, InputBufferLength);
-
-		//
-		// Get the output buffer. Framework calls MmGetSystemAddressForMdlSafe
-		// on the Irp->MdlAddress and returns the system address.
-		// For this method, this buffer is intended for transfering data from the
-		// driver to the application.
-		//
-		status = WdfRequestRetrieveOutputBuffer(Request, 0, reinterpret_cast<PVOID *>(&buffer), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			break;
-		}
-
-		ASSERT(bufSize == OutputBufferLength);
-
-		//
-		// Write data to be sent to the user in this buffer
-		//
-		RtlCopyMemory(buffer, data, OutputBufferLength);
-
-		PrintChars(buffer, datalen);
-
-		WdfRequestSetInformation(Request,
-			OutputBufferLength < datalen ? OutputBufferLength : datalen);
-
-		//
-		// NOTE: Changes made to the  SystemBuffer are not copied
-		// to the user input buffer by the I/O manager
-		//
-
-		break;
 	default:
 
 		//
@@ -495,29 +391,3 @@ NTSTATUS
 
 	return;
 }
-
-VOID PrintChars(_In_reads_(CountChars) PCHAR BufferAddress, _In_ size_t CountChars)
-{
-	if (CountChars) {
-
-		while (CountChars--) {
-
-			if (*BufferAddress > 31
-				&& *BufferAddress != 127) {
-
-				KdPrint(("%c", *BufferAddress));
-
-			}
-			else {
-
-				KdPrint(("."));
-
-			}
-			BufferAddress++;
-		}
-		KdPrint(("\n"));
-	}
-	return;
-}
-
-
