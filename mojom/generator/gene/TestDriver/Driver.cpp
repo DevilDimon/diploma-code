@@ -8,6 +8,7 @@
 #include "Public.h"
 #include "KVector.h"
 #include "..\gene_embedded_types.h"
+#include "gene_ioctl.h"
 
 #include "..\gene_runtime.h"
 #include "..\test.mojom.h"
@@ -71,7 +72,7 @@ NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath)
 	}
 
 	//
-	// Call NonPnpDeviceAdd to create a deviceobject to represent our
+	// Call TestDeviceAdd to create a deviceobject to represent our
 	// software device.
 	//
 	status = TestDeviceAdd(hDriver, pInit);
@@ -239,103 +240,6 @@ End:
 
 }
 
-VOID DrvEvtIoDeviceControl(IN WDFQUEUE Queue, IN WDFREQUEST Request, IN size_t OutputBufferLength,
-	IN size_t InputBufferLength, IN ULONG IoControlCode)
-/*++
-Routine Description:
-
-This event is called when the framework receives IRP_MJ_DEVICE_CONTROL
-requests from the system.
-
-Arguments:
-
-Queue - Handle to the framework queue object that is associated
-with the I/O request.
-Request - Handle to a framework request object.
-
-OutputBufferLength - length of the request's output buffer,
-if an output buffer is available.
-InputBufferLength - length of the request's input buffer,
-if an input buffer is available.
-
-IoControlCode - the driver-defined or system-defined I/O control code
-(IOCTL) that is associated with the request.
-
-Return Value:
-
-VOID
-
---*/
-{
-	NTSTATUS status = STATUS_SUCCESS; // Assume success
-	PCHAR inBuf = nullptr; // pointer to Input buffer
-	size_t bufSize;
-
-	UNREFERENCED_PARAMETER(Queue);
-	UNREFERENCED_PARAMETER(OutputBufferLength);
-
-	PAGED_CODE();
-
-	if (!InputBufferLength)
-	{
-		WdfRequestComplete(Request, STATUS_INVALID_PARAMETER);
-		return;
-	}
-
-	//
-	// Determine which I/O control code was specified.
-	//
-
-	switch (IoControlCode)
-	{
-	case IOCTL_TEST_METHOD_BUFFERED: {
-
-		//
-		// For bufffered ioctls WdfRequestRetrieveInputBuffer &
-		// WdfRequestRetrieveOutputBuffer return the same buffer
-		// pointer (Irp->AssociatedIrp.SystemBuffer), so read the
-		// content of the buffer before writing to it.
-		//
-		status = WdfRequestRetrieveInputBuffer(Request, 0, reinterpret_cast<PVOID *>(&inBuf), &bufSize);
-		if (!NT_SUCCESS(status)) {
-			status = STATUS_INSUFFICIENT_RESOURCES;
-			break;
-		}
-
-		gene_internal::container c;
-		for (int i = 0; i < bufSize; ++i) {
-			c.push_back(inBuf[i]);
-		}
-		
-		gene_runtime.ProcessIncomingMessage(c);
-
-		DbgBreakPoint();
-		
-
-		ASSERT(bufSize == InputBufferLength);
-
-		WdfRequestSetInformation(Request, 0);
-
-		//
-		// When the request is completed the content of the SystemBuffer
-		// is copied to the User output buffer and the SystemBuffer is
-		// is freed.
-		//
-
-		break;
-	}
-
-	default:
-
-		//
-		// The specified I/O control code is unrecognized by this driver.
-		//
-		status = STATUS_INVALID_DEVICE_REQUEST;
-		break;
-	}
-
-	WdfRequestComplete(Request, status);
-}
 
 VOID TestShutdown(WDFDEVICE Device)
 /*++

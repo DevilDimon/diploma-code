@@ -33,6 +33,9 @@
     <ClCompile Include="libc.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="gene_ioctl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gene_ioctl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

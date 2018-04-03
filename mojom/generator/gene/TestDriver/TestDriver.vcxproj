@@ -159,10 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Driver.cpp" />
+    <ClCompile Include="gene_ioctl.cpp" />
     <ClCompile Include="KString.cpp" />
     <ClCompile Include="libc.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="gene_ioctl.h" />
     <ClInclude Include="libc.h" />
     <ClInclude Include="kmstdint.h" />
     <ClInclude Include="KString.h" />
