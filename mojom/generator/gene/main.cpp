@@ -6,7 +6,7 @@
 #include <strsafe.h>
 
 #include "test.mojom.h"
-#include "test.mojom.server.h"
+#include "test.mojom.client.h"
 #include "gene_runtime.h"
 
 using namespace my_module;
@@ -17,7 +17,7 @@ int main() {
 		"hello worlc",
          0x1488,
 		{
-			"villalobos",
+			"oasis",
 			{ 5553535 },
 			std::vector<std::vector<std::string>>{
 				std::vector<std::string>{"definitely", "maybe"},
@@ -44,18 +44,6 @@ int main() {
 		std::cerr << "Could not send msg to driver" << std::endl;
 		return 1;
 	}
-
-	/*
-
-    GeneRuntime r{};
-    r.RegisterCoreHandler(new CoreServer());
-    gene_internal::container container;
-    gene_internal::receive_message_internal(&container);
-    if (r.ProcessIncomingMessage(container)) {
-        std::cout << "Success receiving and processing msg" << std::endl;
-    }
-	*/
-
 
   return 0;
 }

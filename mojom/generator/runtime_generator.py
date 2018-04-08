@@ -1,13 +1,15 @@
 import os
 
 from mojom.parse.ast import Interface
-from mojom.generator.definitions_generator import GenerateMethodIdField, GenerateTypename
+from mojom.generator.definitions_generator import GenerateTypename
+from mojom.generator.clients_generator import GenerateMethodIdField
 
 
 def GenerateRuntime(trees, filenames):
     res = '#pragma once\n'
     for filename in filenames:
         res += '#include \"' + os.path.basename(os.path.normpath(filename)) + '.h\"\n'
+        res += '#include \"' + os.path.basename(os.path.normpath(filename)) + '.client.h\"\n'
 
     res += '\n'
     res += '#include \"gene_includes.h\"\n\n'

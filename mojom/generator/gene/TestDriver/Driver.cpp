@@ -12,6 +12,8 @@
 
 #include "..\gene_runtime.h"
 #include "..\test.mojom.h"
+#include "..\test.mojom.client.h"
+#include "..\test.mojom.server.h"
 
 extern "C" DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_UNLOAD TestEvtDriverUnload;
@@ -77,24 +79,8 @@ NTSTATUS DriverEntry(_DRIVER_OBJECT* DriverObject, PUNICODE_STRING RegistryPath)
 	//
 	status = TestDeviceAdd(hDriver, pInit);
 
-	class CoreImpl : public Core {
-		bool Init(const MyStruct &a, const MySecondStruct &b) override {
-			UNREFERENCED_PARAMETER(a);
-			UNREFERENCED_PARAMETER(b);
-			DbgBreakPoint();
-			return true;
-		}
-
-		bool Shutdown(const MyStruct &a, const MySecondStruct &b) override {
-			UNREFERENCED_PARAMETER(a);
-			UNREFERENCED_PARAMETER(b);
-			DbgBreakPoint();
-			return true;
-		}
-	};
-
 	gene_runtime = GeneRuntime();
-	gene_runtime.RegisterCoreHandler(new CoreImpl());
+	gene_runtime.RegisterCoreHandler(new CoreServer());
 
 	return status;
 }

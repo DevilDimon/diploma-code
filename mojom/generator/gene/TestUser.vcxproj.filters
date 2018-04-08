@@ -50,5 +50,11 @@
     <ClInclude Include="gene_includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="test.mojom.client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test2.mojom.client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

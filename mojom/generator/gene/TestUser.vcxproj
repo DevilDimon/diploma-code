@@ -117,8 +117,10 @@
     <ClInclude Include="gene_embedded_types.h" />
     <ClInclude Include="gene_includes.h" />
     <ClInclude Include="gene_runtime.h" />
+    <ClInclude Include="test.mojom.client.h" />
     <ClInclude Include="test.mojom.h" />
     <ClInclude Include="test.mojom.server.h" />
+    <ClInclude Include="test2.mojom.client.h" />
     <ClInclude Include="test2.mojom.h" />
     <ClInclude Include="test2.mojom.server.h" />
   </ItemGroup>
