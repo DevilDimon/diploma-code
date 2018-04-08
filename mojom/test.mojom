@@ -38,6 +38,6 @@ constraint MyArrayConstraint {
 };
 
 interface Core {
-    Init(MyStruct a, MySecondStruct b);
+    Init(MyStruct a, MySecondStruct b) => (int res);
     Shutdown(MyStruct a, MySecondStruct b);
 };

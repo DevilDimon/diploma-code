@@ -51,24 +51,35 @@ def GenerateHandlerRegistrator(interface):
     return res
 
 def GenerateMessageProcessing(trees):
-    res = '\tbool ProcessIncomingMessage(gene_internal::container &c) {\n'
+    res = '\tvoid ProcessIncomingMessage(gene_internal::container &in, gene_internal::container *out) {\n'
     # Get service id
     res += '\t\tuint64_t service_id;\n'
-    res += '\t\tif (!gene_internal::deserialize(c, &service_id)) return false;\n'
+    res += '\t\tif (!gene_internal::deserialize(in, &service_id)) {\n'
+    res += '\t\t\tgene_internal::serialize(gene_internal::gene_error_code, *out);\n'
+    res += '\t\t\treturn;\n'
+    res += '\t\t}\n'
+
     for tree in trees:
         for interface in filter(lambda obj: isinstance(obj, Interface), tree.definition_list):
             res += '\t\tif (' + GenerateFieldName(interface) + ' && service_id == ' + GenerateFieldName(interface) + '->__service_id) {\n'
             # Get method id
             res += '\t\t\tuint64_t method_id;\n'
-            res += '\t\t\tif (!gene_internal::deserialize(c, &method_id)) return false;\n'
+            res += '\t\t\tif (!gene_internal::deserialize(in, &method_id)) {\n'
+            res += '\t\t\t\tgene_internal::serialize(gene_internal::gene_error_code, *out);\n'
+            res += '\t\t\t\treturn;\n'
+            res += '\t\t\t}\n'
+
             for method in interface.body.items:
                 res += '\t\t\tif (method_id == ' + GenerateFieldName(interface) + '->' + GenerateMethodIdField(method) + ') {\n'
                 # Deserialize parameters
                 for arg in method.parameter_list:
-                    res += '\t\t\t\t\t' + GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ';\n'
-                    res += '\t\t\t\t\tif (!gene_internal::deserialize(c, &' + arg.mojom_name + ')) return false;\n'
+                    res += '\t\t\t\t' + GenerateTypename(arg.typename) + ' ' + arg.mojom_name + ';\n'
+                    res += '\t\t\t\tif (!gene_internal::deserialize(in, &' + arg.mojom_name + ')) {\n'
+                    res += '\t\t\t\t\tgene_internal::serialize(gene_internal::gene_error_code, *out);\n'
+                    res += '\t\t\t\t\treturn;\n'
+                    res += '\t\t\t\t}\n'
                 # Call the method
-                res += '\t\t\t\t\t' + GenerateFieldName(interface) + '->' + method.mojom_name + '('
+                res += '\t\t\t\tauto res = ' + GenerateFieldName(interface) + '->' + method.mojom_name + '('
                 is_empty = True
                 for arg in method.parameter_list:
                     res += arg.mojom_name + ', '
@@ -76,9 +87,12 @@ def GenerateMessageProcessing(trees):
                 if not is_empty:
                     res = res[:-2]
                 res += ');\n'
+                res += '\t\t\t\tif (!res) {\n'
+                res += '\t\t\t\t\tgene_internal::serialize(gene_internal::gene_error_code, *out);\n'
+                res += '\t\t\t\t\treturn;\n'
+                res += '\t\t\t\t}\n'
                 res += '\t\t\t}\n'
             res += '\t\t}\n'
-    res += '\t\treturn true;\n'
     res += '\t}'
 
     return res

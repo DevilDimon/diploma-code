@@ -1,9 +1,4 @@
 #include <iostream>
-#include <cstdlib>
-#include <cstring>
-
-#include <windows.h>
-#include <strsafe.h>
 
 #include "test.mojom.h"
 #include "test.mojom.client.h"

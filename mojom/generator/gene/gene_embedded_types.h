@@ -4,6 +4,14 @@
 
 namespace gene_internal {
 
+bool is_error(const container &c) {
+	uint8_t arr[sizeof(uint64_t)];
+	for (int i = 0; i < sizeof(uint64_t); ++i) {
+		arr[i] = c[i];
+	}
+	return *reinterpret_cast<uint64_t *>(arr) == gene_error_code;
+}
+
 template <typename T> static bool raw_serialize(const T &v, container &c) {
     T temp = v;
     uint8_t *arr = reinterpret_cast<uint8_t *>(&temp);

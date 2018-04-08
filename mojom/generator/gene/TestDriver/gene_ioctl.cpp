@@ -9,7 +9,7 @@ VOID DrvEvtIoDeviceControl(IN WDFQUEUE Queue, IN WDFREQUEST Request, IN size_t O
 	IN size_t InputBufferLength, IN ULONG IoControlCode)
 {
 	NTSTATUS status = STATUS_SUCCESS; // Assume success
-	PCHAR inBuf = nullptr; // pointer to Input buffer
+	PCHAR inBuf = nullptr, outBuf = nullptr; // pointer to Input, Output buffers
 	size_t bufSize;
 
 	UNREFERENCED_PARAMETER(Queue);
@@ -42,18 +42,28 @@ VOID DrvEvtIoDeviceControl(IN WDFQUEUE Queue, IN WDFREQUEST Request, IN size_t O
 			status = STATUS_INSUFFICIENT_RESOURCES;
 			break;
 		}
-
-		gene_internal::container c;
-		for (int i = 0; i < bufSize; ++i) {
-			c.push_back(inBuf[i]);
-		}
-
-		gene_runtime.ProcessIncomingMessage(c);
-
-
 		ASSERT(bufSize == InputBufferLength);
 
-		WdfRequestSetInformation(Request, 0);
+		gene_internal::container in;
+		for (int i = 0; i < bufSize; ++i) {
+			in.push_back(inBuf[i]);
+		}
+
+		gene_internal::container out;
+		gene_runtime.ProcessIncomingMessage(in, &out);
+
+		status = WdfRequestRetrieveOutputBuffer(Request, 0, reinterpret_cast<PVOID *>(&outBuf), &bufSize);
+
+		if (!NT_SUCCESS(status)) {
+			status = STATUS_INSUFFICIENT_RESOURCES;
+			break;
+		}
+		ASSERT(bufSize == OutputBufferLength);
+
+		RtlCopyMemory(outBuf, out.data(), out.size());
+
+		WdfRequestSetInformation(Request,
+			OutputBufferLength < out.size() ? OutputBufferLength : out.size());
 
 		//
 		// When the request is completed the content of the SystemBuffer

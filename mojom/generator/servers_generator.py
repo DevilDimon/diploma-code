@@ -22,7 +22,7 @@ def GenerateServers(tree, filename):
 
     for obj in tree.definition_list:
         if isinstance(obj, Interface):
-            res += GenerateInterfaceUserModeServer(obj) + '\n'
+            res += GenerateInterfaceServer(obj) + '\n'
 
     if tree.module is not None:
         res += '\n}  // ' + namespace + '\n\n'
@@ -32,11 +32,14 @@ def GenerateServers(tree, filename):
 
     return res
 
-def GenerateInterfaceUserModeServer(interface):
+def GenerateInterfaceServer(interface):
     res = 'class ' + interface.mojom_name + 'Server final : public ' + interface.mojom_name + ' {\n'
     res += '\tpublic:\n'
     for method in interface.body.items:
-        res += '\tbool ' + method.mojom_name + '('
+        if method.response_parameter_list is None:
+            res += '\tbool ' + method.mojom_name + '('
+        else:
+            res += '\tstd::optional<' + GenerateTypename(method.response_parameter_list.items[0].typename) + '> ' + method.mojom_name + '('
         is_empty = True
         for arg in method.parameter_list:
             res += 'const ' + GenerateTypename(arg.typename) + ' &' + arg.mojom_name + ', '

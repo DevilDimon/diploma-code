@@ -4,9 +4,9 @@
 namespace gene_internal {
 
 using container = std::vector<uint8_t>;
+const uint64_t gene_error_code = 0xFEFEFEFEFEFEUL;
 
-bool send_message_internal(const container &c);
-bool receive_message_internal(container *c);
+bool exchange_messages_internal(const container &in, container *out);
 
 template <typename T> struct serializer {
   bool operator()(const T &v, container &c);

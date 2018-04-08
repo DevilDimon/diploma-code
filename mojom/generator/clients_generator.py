@@ -20,7 +20,7 @@ def GenerateClients(tree, filename):
     for obj in tree.definition_list:
         if isinstance(obj, Interface):
             res += GenerateInterface(obj) + '\n'
-            res += GenerateInterfaceUserModeClient(obj) + '\n'
+            res += GenerateInterfaceClient(obj) + '\n'
 
     if tree.module is not None:
         res += '\n}  // ' + namespace + '\n\n'
@@ -40,7 +40,10 @@ def GenerateInterface(interface):
 
     res += '\n'
     for method in interface.body.items:
-        res += '\tvirtual bool ' + method.mojom_name + '('
+        if method.response_parameter_list is None:
+            res += '\tvirtual bool ' + method.mojom_name + '('
+        else:
+             res += '\tvirtual std::optional<' + GenerateTypename(method.response_parameter_list.items[0].typename) + '> ' + method.mojom_name + '('
         for arg in method.parameter_list:
             res += 'const ' + GenerateTypename(arg.typename) + ' &' + arg.mojom_name + ', '
         res = res[:-2] + ') = 0;\n'
@@ -48,12 +51,18 @@ def GenerateInterface(interface):
 
     return res
 
-def GenerateInterfaceUserModeClient(interface):
+def GenerateInterfaceClient(interface):
     res = 'class ' + interface.mojom_name + 'Client final : public ' + interface.mojom_name + ' {\n'
     res += '\tpublic:\n'
 
     for method in interface.body.items:
-        res += '\tbool ' + method.mojom_name + '('
+        response_typename = None
+        if method.response_parameter_list is None:
+            res += '\tbool ' + method.mojom_name + '('
+        else:
+            response_typename = GenerateTypename(method.response_parameter_list.items[0].typename)
+            res += '\tstd::optional<' + response_typename + '> ' + method.mojom_name + '('
+        
         is_empty = True
         for arg in method.parameter_list:
             res += 'const ' + GenerateTypename(arg.typename) + ' &' + arg.mojom_name + ', '
@@ -61,12 +70,26 @@ def GenerateInterfaceUserModeClient(interface):
         if not is_empty:
             res = res[:-2]
         res += ') final {\n'
-        res += '\t\tgene_internal::container __c;\n'
-        res += '\t\treturn gene_internal::serialize(__service_id, __c) &&\n'
-        res += '\t\t\tgene_internal::serialize(' + GenerateMethodIdField(method) + ', __c) &&\n'
+        res += '\t\tgene_internal::container __inBuf;\n'
+        if response_typename is not None:
+            res += '\t\tgene_internal::container __outBuf;\n'
+        res += '\t\tbool __success = gene_internal::serialize(__service_id, __inBuf) &&\n'
+        res += '\t\t\tgene_internal::serialize(' + GenerateMethodIdField(method) + ', __inBuf) &&\n'
         for arg in method.parameter_list:
-            res += '\t\t\tgene_internal::serialize(' + arg.mojom_name + ', __c) &&\n'
-        res += '\t\t\tgene_internal::send_message_internal(__c);\n'
+            res += '\t\t\tgene_internal::serialize(' + arg.mojom_name + ', __inBuf) &&\n'
+        if response_typename is not None:
+            res += '\t\t\tgene_internal::exchange_messages_internal(__inBuf, &__outBuf);\n'
+        else:
+            res += '\t\t\tgene_internal::exchange_messages_internal(__inBuf, nullptr);\n'
+        if response_typename is None:
+            res += '\t\treturn __success;\n'
+        else:
+             res += '\t\tif (__success && !gene_internal::is_error(__outBuf)) {\n'
+             res += '\t\t\t' + response_typename + ' __res;\n'
+             res += '\t\t\treturn gene_internal::deserialize(__outBuf, &__res) ? std::optional<' + response_typename + '>(__res) : std::nullopt;\n'
+             res += '\t\t} else {\n'
+             res += '\t\t\treturn std::nullopt;\n'
+             res += '\t\t}\n'
         res += '\t}\n'
     res += '};\n'
 
