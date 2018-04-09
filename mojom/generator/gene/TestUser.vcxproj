@@ -109,6 +109,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="gene_basics.cpp" />
     <ClCompile Include="gene_basics_um.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

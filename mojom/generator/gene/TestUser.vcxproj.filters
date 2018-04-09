@@ -21,6 +21,9 @@
     <ClCompile Include="gene_basics_um.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gene_basics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gene_basics.h">

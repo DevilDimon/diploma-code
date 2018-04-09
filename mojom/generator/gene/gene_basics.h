@@ -5,6 +5,8 @@ namespace gene_internal {
 
 using container = std::vector<uint8_t>;
 const uint64_t gene_error_code = 0xFEFEFEFEFEFEUL;
+bool is_error(const container &c);
+
 
 bool exchange_messages_internal(const container &in, container *out);
 

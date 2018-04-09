@@ -32,10 +32,11 @@ int main() {
 
 
 	CoreClient c;
-    if (c.Init(str, str2)) {
-        std::cout << "Success sending msg" << std::endl;
-    }
-	else {
+	auto res = c.Init(str, str2);
+	if (res) {
+		std::cout << "Success sending msg" << std::endl;
+		std::cout << *res << std::endl;
+	} else {
 		std::cerr << "Could not send msg to driver" << std::endl;
 		return 1;
 	}

@@ -56,5 +56,8 @@
     <ClInclude Include="gene_ioctl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="kmoptional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

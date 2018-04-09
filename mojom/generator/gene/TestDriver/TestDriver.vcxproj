@@ -148,7 +148,7 @@
     <ClCompile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PreprocessorDefinitions>GENE_KERNEL_MODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -165,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gene_ioctl.h" />
+    <ClInclude Include="kmoptional.h" />
     <ClInclude Include="libc.h" />
     <ClInclude Include="kmstdint.h" />
     <ClInclude Include="KString.h" />

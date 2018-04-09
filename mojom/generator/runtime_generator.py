@@ -91,6 +91,8 @@ def GenerateMessageProcessing(trees):
                 res += '\t\t\t\t\tgene_internal::serialize(gene_internal::gene_error_code, *out);\n'
                 res += '\t\t\t\t\treturn;\n'
                 res += '\t\t\t\t}\n'
+                if method.response_parameter_list is not None:
+                    res += '\t\t\t\tgene_internal::serialize(*res, *out);\n'
                 res += '\t\t\t}\n'
             res += '\t\t}\n'
     res += '\t}'
