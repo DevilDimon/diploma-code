@@ -1,4 +1,3 @@
-#pragma once
 #include <iostream>
 #include <windows.h>
 #include "gene_basics.h"
