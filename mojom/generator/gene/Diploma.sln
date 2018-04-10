@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDriver", "TestDriver\Te
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestUser", "TestUser.vcxproj", "{340B61E6-B1F9-468E-99CA-A7C75342A868}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeneTests", "..\GeneTests\GeneTests.vcxproj", "{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -56,6 +58,18 @@ Global
 		{340B61E6-B1F9-468E-99CA-A7C75342A868}.Release|x64.Build.0 = Release|x64
 		{340B61E6-B1F9-468E-99CA-A7C75342A868}.Release|x86.ActiveCfg = Release|Win32
 		{340B61E6-B1F9-468E-99CA-A7C75342A868}.Release|x86.Build.0 = Release|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|ARM.ActiveCfg = Debug|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|ARM64.ActiveCfg = Debug|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|x64.ActiveCfg = Debug|x64
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|x64.Build.0 = Debug|x64
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|x86.ActiveCfg = Debug|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Debug|x86.Build.0 = Debug|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|ARM.ActiveCfg = Release|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|ARM64.ActiveCfg = Release|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|x64.ActiveCfg = Release|x64
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|x64.Build.0 = Release|x64
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|x86.ActiveCfg = Release|Win32
+		{9776DA6D-714D-4AD8-BB8E-1770EA05EFB3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
