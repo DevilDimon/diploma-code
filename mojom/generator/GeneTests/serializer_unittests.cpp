@@ -186,7 +186,12 @@ TEST(TestSerialization, StringValues) {
 }
 
 TEST(TestSerialization, UltimateTest) {
-
+	ultimate_test_struct in = {
+		2, 2.f, 2.0, {{{2}}}, "mega rigorous testing", {{0x2019}}
+	};
+	ultimate_test_struct out;
+	ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+	ASSERT_EQ(in, out);
 }
 
 } // namespace gene_test_serialization
