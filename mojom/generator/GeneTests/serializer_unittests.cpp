@@ -125,6 +125,106 @@ TEST(TestSerialization, IntValues) {
 	}
 }
 
+TEST(TestSerialization, Int8Values) {
+	int8_t test_cases[] = { 0, -1, 1,
+		std::numeric_limits<int8_t>::min(),
+		std::numeric_limits<int8_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		int8_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, Int16Values) {
+	int16_t test_cases[] = { 0, -1, 1,
+		std::numeric_limits<int16_t>::min(),
+		std::numeric_limits<int16_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		int16_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, Int32Values) {
+	int32_t test_cases[] = { 0, -1, 1,
+		std::numeric_limits<int32_t>::min(),
+		std::numeric_limits<int32_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		int32_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, Int64Values) {
+	int64_t test_cases[] = { 0, -1, 1,
+		std::numeric_limits<int64_t>::min(),
+		std::numeric_limits<int64_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		int64_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, UInt8Values) {
+	uint8_t test_cases[] = { 0, 1,
+		std::numeric_limits<uint8_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		uint8_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, UInt16Values) {
+	uint16_t test_cases[] = { 0, 1,
+		std::numeric_limits<uint16_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		uint16_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, UInt32Values) {
+	uint32_t test_cases[] = { 0, 1,
+		std::numeric_limits<uint32_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		uint32_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
+TEST(TestSerialization, UInt64Values) {
+	uint64_t test_cases[] = { 0, 1,
+		std::numeric_limits<uint64_t>::max() };
+
+	for (auto int_case : test_cases) {
+		auto in = int_case;
+		uint64_t out;
+		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+		ASSERT_EQ(in, out);
+	}
+}
+
 TEST(TestSerialization, FloatValues) {
 	float test_cases[] = { -0.0f, +0.0f, -1.0f, +1.0f,
 		std::numeric_limits<float>::min(),
@@ -165,12 +265,10 @@ TEST(TestSerialization, PrimitiveVectorValues) {
 }
 
 TEST(TestSerialization, StructuredVectorValues) {
-
 	test_struct1 in = { {2} };
 	test_struct1 out;
 	ASSERT_TRUE(serialize_and_deserialize(&in, &out));
 	ASSERT_EQ(in, out);
-	
 }
 
 TEST(TestSerialization, StringValues) {
@@ -182,7 +280,6 @@ TEST(TestSerialization, StringValues) {
 		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
 		ASSERT_EQ(in, out);
 	}
-
 }
 
 TEST(TestSerialization, UltimateTest) {
