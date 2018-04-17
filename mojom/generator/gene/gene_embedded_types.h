@@ -14,6 +14,9 @@ template <typename T> static bool raw_serialize(const T &v, container &c) {
 }
 
 template <typename T> static bool raw_deserialize(container &c, T *v) {
+	if (v == nullptr) {
+		return false;
+	}
     uint8_t arr[sizeof(T)];
     for (int i = 0; i < sizeof(T); ++i) {
         arr[i] = c[i];
@@ -131,6 +134,10 @@ template <> struct serializer<std::string> {
       return true;
   }
   bool operator()(container &c, std::string *v) const {
+	  if (!v) {
+		  return false;
+	  }
+
       std::string::size_type size;
       if (!raw_deserialize(c, &size)) {
           return false;
@@ -163,6 +170,10 @@ template <typename T> struct serializer<std::vector<T>> {
     return true;
   }
   bool operator()(container &c, std::vector<T> *v) const {
+	  if (!v) {
+		  return false;
+	  }
+
       typename std::vector<T>::size_type size;
       if (!raw_deserialize(c, &size)) {
           return false;

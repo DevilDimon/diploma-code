@@ -100,9 +100,10 @@ template <> struct serializer<ultimate_test_struct> {
 namespace gene_test_serialization {
 
 template <typename T>
-bool serialize_and_deserialize(T *in, T *out) {
+bool serialize_and_deserialize(const T &in, T *out) {
 	gene_internal::container c;
-	if (!gene_internal::serialize(*in, c)) {
+	
+	if (!gene_internal::serialize(in, c)) {
 		return false;
 	}
 	if (!gene_internal::deserialize(c, out)) {
@@ -112,16 +113,29 @@ bool serialize_and_deserialize(T *in, T *out) {
 	return true;
 }
 
+TEST(TestSerialization, NullValues) {
+	int val = 0;
+	int *null = nullptr;
+	ASSERT_FALSE(serialize_and_deserialize(val, null));
+
+	std::string str_val = "hello";
+	std::string *null_str = nullptr;
+	ASSERT_FALSE(serialize_and_deserialize(str_val, null_str));
+
+	std::vector<int> vec_val = {};
+	std::vector<int> *null_vec = nullptr;
+	ASSERT_FALSE(serialize_and_deserialize(vec_val, null_vec));
+}
+
 TEST(TestSerialization, IntValues) {
 	int test_cases[] = { 0, -1, 1,
 		std::numeric_limits<int>::min(),
 		std::numeric_limits<int>::max() };
 
 	for (int int_case : test_cases) {
-		int in = int_case;
 		int out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -131,10 +145,9 @@ TEST(TestSerialization, Int8Values) {
 		std::numeric_limits<int8_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		int8_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -144,10 +157,9 @@ TEST(TestSerialization, Int16Values) {
 		std::numeric_limits<int16_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		int16_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -157,10 +169,9 @@ TEST(TestSerialization, Int32Values) {
 		std::numeric_limits<int32_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		int32_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -170,10 +181,9 @@ TEST(TestSerialization, Int64Values) {
 		std::numeric_limits<int64_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		int64_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -182,10 +192,9 @@ TEST(TestSerialization, UInt8Values) {
 		std::numeric_limits<uint8_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		uint8_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -194,10 +203,9 @@ TEST(TestSerialization, UInt16Values) {
 		std::numeric_limits<uint16_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		uint16_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -206,10 +214,9 @@ TEST(TestSerialization, UInt32Values) {
 		std::numeric_limits<uint32_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		uint32_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -218,10 +225,9 @@ TEST(TestSerialization, UInt64Values) {
 		std::numeric_limits<uint64_t>::max() };
 
 	for (auto int_case : test_cases) {
-		auto in = int_case;
 		uint64_t out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(int_case, &out));
+		ASSERT_EQ(int_case, out);
 	}
 }
 
@@ -231,10 +237,9 @@ TEST(TestSerialization, FloatValues) {
 		std::numeric_limits<float>::max() };
 
 	for (float float_case : test_cases) {
-		float in = float_case;
 		float out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(float_case, &out));
+		ASSERT_EQ(float_case, out);
 	}
 }
 
@@ -244,10 +249,9 @@ TEST(TestSerialization, DoubleValues) {
 		std::numeric_limits<double>::max() };
 
 	for (double double_case : test_cases) {
-		double in = double_case;
 		double out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(double_case, &out));
+		ASSERT_EQ(double_case, out);
 	}
 }
 
@@ -257,17 +261,16 @@ TEST(TestSerialization, PrimitiveVectorValues) {
 	};
 
 	for (auto vector_case : test_cases) {
-		auto in = vector_case;
 		std::vector<int> out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(vector_case, &out));
+		ASSERT_EQ(vector_case, out);
 	}
 }
 
 TEST(TestSerialization, StructuredVectorValues) {
 	test_struct1 in = { {2} };
 	test_struct1 out;
-	ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+	ASSERT_TRUE(serialize_and_deserialize(in, &out));
 	ASSERT_EQ(in, out);
 }
 
@@ -275,10 +278,9 @@ TEST(TestSerialization, StringValues) {
 	std::string test_cases[] = { "", "ascii", "\xf0\x9f\x8e\x86" };
 
 	for (std::string string_case : test_cases) {
-		std::string in = string_case;
 		std::string out;
-		ASSERT_TRUE(serialize_and_deserialize(&in, &out));
-		ASSERT_EQ(in, out);
+		ASSERT_TRUE(serialize_and_deserialize(string_case, &out));
+		ASSERT_EQ(string_case, out);
 	}
 }
 
@@ -287,7 +289,7 @@ TEST(TestSerialization, UltimateTest) {
 		2, 2.f, 2.0, {{{2}}}, "mega rigorous testing", {{0x2019}}
 	};
 	ultimate_test_struct out;
-	ASSERT_TRUE(serialize_and_deserialize(&in, &out));
+	ASSERT_TRUE(serialize_and_deserialize(in, &out));
 	ASSERT_EQ(in, out);
 }
 
